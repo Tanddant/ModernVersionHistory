@@ -7,16 +7,7 @@ import {
 } from '@microsoft/sp-listview-extensibility';
 import { Dialog } from '@microsoft/sp-dialog';
 
-/**
- * If your command set uses the ClientSideComponentProperties JSON input,
- * it will be deserialized into the BaseExtension.properties object.
- * You can define an interface to describe it.
- */
-export interface IBetterVersionHistoryCommandSetProperties {
-  // This is an example; replace with your own properties
-  sampleTextOne: string;
-  sampleTextTwo: string;
-}
+export interface IBetterVersionHistoryCommandSetProperties {}
 
 const LOG_SOURCE: string = 'BetterVersionHistoryCommandSet';
 
@@ -37,12 +28,12 @@ export default class BetterVersionHistoryCommandSet extends BaseListViewCommandS
   public onExecute(event: IListViewCommandSetExecuteEventParameters): void {
     switch (event.itemId) {
       case 'COMMAND_1':
-        Dialog.alert(`${this.properties.sampleTextOne}`).catch(() => {
+        Dialog.alert(`COMMAND_1`).catch(() => {
           /* handle error */
         });
         break;
       case 'COMMAND_2':
-        Dialog.alert(`${this.properties.sampleTextTwo}`).catch(() => {
+        Dialog.alert(`COMMAND_2`).catch(() => {
           /* handle error */
         });
         break;
