@@ -9,6 +9,7 @@ import { BetterVersionHistory, IBetterVersionHistoryProps } from './components/B
 import DialogWrapper from './components/DialogWrapper';
 import * as React from 'react';
 import { getThemeColor } from './themeHelper';
+import { DataProvider } from './providers/DataProvider';
 
 export interface IBetterVersionHistoryCommandSetProperties { }
 
@@ -35,11 +36,10 @@ export default class BetterVersionHistoryCommandSet extends BaseListViewCommandS
   public onExecute(event: IListViewCommandSetExecuteEventParameters): void {
     switch (event.itemId) {
       case 'COMMAND_1':
-        const element = React.createElement(BetterVersionHistory, { close: null });
+        const element = React.createElement(BetterVersionHistory, { close: null, provider: new DataProvider(this.context) } as IBetterVersionHistoryProps);
         const wrapper = new DialogWrapper<IBetterVersionHistoryProps>(element);
         element.props.close = () => wrapper.close();
         wrapper.show();
-
         break;
       default:
         throw new Error('Unknown command');
