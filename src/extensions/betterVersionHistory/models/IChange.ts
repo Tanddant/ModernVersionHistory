@@ -1,3 +1,4 @@
+import { FieldType } from "./FieldTypes";
 import { IFieldUserValue } from "./FieldValues";
 
 export interface IChange {
@@ -9,6 +10,7 @@ export interface IChange {
 
 export interface IFieldChange {
     FieldName: string;
+    FieldType: FieldType;
     OldValue: string;
     NewValue: string;
 }

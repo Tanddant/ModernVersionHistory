@@ -3,10 +3,10 @@ import { SPFx, SPFI, spfi } from "@pnp/sp/presets/all";
 import { IField } from "../models/IField";
 import { IChange } from "../models/IChange";
 import { FieldType } from "../models/FieldTypes";
-import { IFieldLookupValue } from "../models/FieldValues";
+import { IFieldLookupValue, IFieldUrlValue } from "../models/FieldValues";
 
 export interface IDataProvider {
-    GetVersions(): Promise<any>;
+    GetVersions(): Promise<IChange[]>
 }
 
 export class DataProvider implements IDataProvider {
@@ -23,8 +23,8 @@ export class DataProvider implements IDataProvider {
         return this._SPFI;
     }
 
-    private fieldsToSkip: string[] = ["Modified","Created"];
-    public async GetVersions(): Promise<any> {
+    private fieldsToSkip: string[] = ["Modified", "Created"];
+    public async GetVersions(): Promise<IChange[]> {
         const fields = await this.GetFields(this._context.pageContext.list.id.toString());
         console.log(fields);
 
@@ -33,9 +33,10 @@ export class DataProvider implements IDataProvider {
         let Changes: IChange[] = [];
 
         let fieldsToHandle: string[] = [];
-        for (let i = 0; i < versions.length; i++) {
-            const version = versions[i];
-            const prevVersion = versions[1 + 1];
+        for (let i = versions.length; i > 0; i--) {
+            const version = versions[i - 1];
+            const prevVersion = versions[i] ?? {};
+
             const Version: IChange = {
                 VersionName: version.VersionLabel,
                 Author: version.Editor,
@@ -46,19 +47,19 @@ export class DataProvider implements IDataProvider {
             for (let field of fields) {
                 if (this.fieldsToSkip.indexOf(field.StaticName) != -1)
                     continue;
-                    
+
                 switch (field.TypeAsString) {
                     case FieldType.Text:
                     case FieldType.Note:
                     case FieldType.Integer:
                     case FieldType.Number:
-                    case FieldType.Boolean:
                     case FieldType.Choice:
                         if (version[field.StaticName] != prevVersion[field.StaticName]) {
                             Version.Changes.push({
                                 FieldName: field.Title,
                                 OldValue: prevVersion[field.StaticName],
-                                NewValue: version[field.StaticName]
+                                NewValue: version[field.StaticName],
+                                FieldType: field.TypeAsString
                             });
                         }
                         break;
@@ -68,7 +69,8 @@ export class DataProvider implements IDataProvider {
                             Version.Changes.push({
                                 FieldName: field.Title,
                                 OldValue: (prevVersion[field.StaticName] as IFieldLookupValue)?.LookupValue,
-                                NewValue: (version[field.StaticName] as IFieldLookupValue)?.LookupValue
+                                NewValue: (version[field.StaticName] as IFieldLookupValue)?.LookupValue,
+                                FieldType: field.TypeAsString
                             });
                         }
                         break;
@@ -78,6 +80,51 @@ export class DataProvider implements IDataProvider {
                                 FieldName: field.Title,
                                 OldValue: new Date(prevVersion[field.StaticName]).toLocaleString(),
                                 NewValue: new Date(version[field.StaticName]).toLocaleString(),
+                                FieldType: field.TypeAsString
+                            });
+                        }
+                        break;
+                    case FieldType.UserMulti:
+                    case FieldType.LookupMulti:
+                        if (JSON.stringify(version[field.StaticName]) != JSON.stringify(prevVersion[field.StaticName])) {
+                            Version.Changes.push({
+                                FieldName: field.Title,
+                                OldValue: (prevVersion[field.StaticName] as IFieldLookupValue[])?.map(x => x.LookupValue).join(", "),
+                                NewValue: (version[field.StaticName] as IFieldLookupValue[])?.map(x => x.LookupValue).join(", "),
+                                FieldType: field.TypeAsString
+                            });
+                        };
+                        break;
+                    case FieldType.MultiChoice:
+                        if (JSON.stringify(version[field.StaticName]) != JSON.stringify(prevVersion[field.StaticName])) {
+                            Version.Changes.push({
+                                FieldName: field.Title,
+                                OldValue: (prevVersion[field.StaticName] as string[])?.join(", "),
+                                NewValue: (version[field.StaticName] as string[])?.join(", "),
+                                FieldType: field.TypeAsString
+                            });
+                        };
+                        break;
+                    case FieldType.URL:
+                        const BeforeUrlString = `${(prevVersion[field.StaticName] as IFieldUrlValue)?.Description} (${(prevVersion[field.StaticName] as IFieldUrlValue)?.Url})`;
+                        const NewUrlString = `${(version[field.StaticName] as IFieldUrlValue).Description} (${(version[field.StaticName] as IFieldUrlValue).Url})`;
+                        if (BeforeUrlString != NewUrlString) {
+                            Version.Changes.push({
+                                FieldName: field.Title,
+                                OldValue: BeforeUrlString,
+                                NewValue: NewUrlString,
+                                FieldType: field.TypeAsString
+                            });
+                        }
+                        break;
+
+                    case FieldType.Boolean:
+                        if (version[field.StaticName] != prevVersion[field.StaticName]) {
+                            Version.Changes.push({
+                                FieldName: field.Title,
+                                OldValue: prevVersion[field.StaticName] ? "Yes" : "No",
+                                NewValue: version[field.StaticName] ? "Yes" : "No",
+                                FieldType: field.TypeAsString
                             });
                         }
                         break;
@@ -90,10 +137,10 @@ export class DataProvider implements IDataProvider {
             Changes.push(Version);
         }
 
+        Changes.reverse();
+
         console.log(fieldsToHandle);
-        console.log(Changes);
-        debugger;
-        return versions;
+        return Changes;
     }
 
     private async GetFields(listId: string): Promise<IField[]> {
