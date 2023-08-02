@@ -10,6 +10,7 @@ import DialogWrapper from './components/DialogWrapper';
 import * as React from 'react';
 import { getThemeColor } from './themeHelper';
 import { DataProvider } from './providers/DataProvider';
+import { SPFxContext } from './contexts/SPFxContext';
 
 export interface IBetterVersionHistoryCommandSetProperties { }
 
@@ -37,7 +38,8 @@ export default class BetterVersionHistoryCommandSet extends BaseListViewCommandS
     switch (event.itemId) {
       case 'COMMAND_1':
         const element = React.createElement(BetterVersionHistory, { close: null, provider: new DataProvider(this.context) } as IBetterVersionHistoryProps);
-        const wrapper = new DialogWrapper<IBetterVersionHistoryProps>(element);
+        const context = React.createElement(SPFxContext.Provider, { value: { context: this.context } }, element);
+        const wrapper = new DialogWrapper(context);
         element.props.close = () => wrapper.close();
         wrapper.show();
         break;
@@ -54,10 +56,7 @@ export default class BetterVersionHistoryCommandSet extends BaseListViewCommandS
       // This command should be hidden unless exactly one row is selected.
       compareOneCommand.visible = this.context.listView.selectedRows?.length === 1;
     }
-
-    // TODO: Add your logic here
-
-    // You should call this.raiseOnChage() to update the command bar
+    
     this.raiseOnChange();
   }
 }

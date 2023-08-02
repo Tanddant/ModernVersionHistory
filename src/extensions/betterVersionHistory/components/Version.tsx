@@ -1,0 +1,48 @@
+import * as React from 'react';
+import { IVersion } from '../models/IVersion';
+import { FieldUser } from './FieldUserPerson';
+import { Icon, Text, TooltipHost, PersonaSize, Link } from '@fluentui/react';
+import { FieldType } from '../models/FieldTypes';
+import { IFieldUrlValue, IFieldUserValue } from '../models/FieldValues';
+import ClampLines from 'react-clamp-lines';
+
+export interface IVersionProps {
+    Version: IVersion;
+    className: string;
+}
+
+export const Version: React.FunctionComponent<IVersionProps> = (props: React.PropsWithChildren<IVersionProps>) => {
+    const { Version } = props;
+    return (
+        <div style={{ display: "flex", padding: 10 }} className={props.className}>
+            <FieldUser user={Version.Author} hidePersonaDetails />
+            <div style={{ display: "flex", flexDirection: "column", marginLeft: "1em", flexGrow: 1 }}>
+                <div>
+                    <Icon iconName="EditContact" />&nbsp;
+                    <Text variant='medium' styles={{ root: { fontWeight: "bold" } }}>Version: {Version.VersionName}</Text>
+                </div>
+                {Version.Changes.map((change) => {
+                    switch (change.FieldType) {
+                        case FieldType.Note:
+                            return <Text>{change.FieldName}: {change.NewValue}</Text>;
+                        case FieldType.User:
+                            return <Text styles={{ root: { display: 'flex' } }}>{change.FieldName}:&nbsp;&nbsp;<FieldUser user={change.Data as IFieldUserValue} size={PersonaSize.size24} /></Text>
+                        case FieldType.UserMulti:
+                            return <Text styles={{ root: { display: 'flex' } }}>{change.FieldName}:&nbsp;&nbsp; {(change.Data as (IFieldUserValue[])).map(user => <FieldUser user={user} size={PersonaSize.size24} />)} </Text>
+                        case FieldType.URL:
+                            const link = change.Data as IFieldUrlValue;
+                            return <Text>{change.FieldName}: <Link href={link.Url} target='_blank'>{link.Description}</Link></Text>
+                        default:
+                            return <Text>{change.FieldName}: <TooltipHost content={change.OldValue}>{change.NewValue}</TooltipHost></Text>
+                    }
+                })}
+
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <Text variant='small' styles={{ root: { backgroundColor: "lightgrey", borderRadius: 3, padding: "0.25em" } }}>{Version.Author.LookupValue}</Text>
+
+                    <Text variant='small'>{Version.TimeStamp.toLocaleString()}</Text>
+                </div>
+            </div>
+        </div>
+    );
+};

@@ -1,4 +1,4 @@
-import { FieldType } from "./FieldTypes"
+import { DisplayFormat, FieldType } from "./FieldTypes"
 
 export interface IField {
     "odata.type": string
@@ -48,7 +48,7 @@ export interface IField {
     CommaSeparator?: boolean
     CustomUnitName: any
     CustomUnitOnRight?: boolean
-    DisplayFormat?: number
+    DisplayFormat?: DisplayFormat
     MaximumValue?: number
     MinimumValue?: number
     ShowAsPercentage?: boolean

@@ -19,10 +19,13 @@
     "@microsoft/sp-listview-extensibility": "1.17.4",
     "@pnp/graph": "^3.17.0",
     "@pnp/sp": "^3.17.0",
+    "@pnp/spfx-controls-react": "3.15.0",
     "@types/react": "17.0.45",
     "@types/react-dom": "17.0.17",
     "react": "17.0.1",
+    "react-clamp-lines": "^3.0.3",
     "react-dom": "17.0.1",
+    "react-lines-ellipsis": "^0.15.3",
     "tslib": "2.3.1"
   },
   "devDependencies": {

@@ -17,3 +17,8 @@ export enum FieldType {
     UserMulti = "UserMulti",
     ContentTypeId = "ContentTypeId",
 }
+
+export enum DisplayFormat {
+    DateOnly = 0,
+    DateTime = 1,
+}
