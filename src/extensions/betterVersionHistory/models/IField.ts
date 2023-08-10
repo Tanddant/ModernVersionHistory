@@ -7,12 +7,12 @@ export interface IField {
     AutoIndexed: boolean
     CanBeDeleted: boolean
     ClientSideComponentId: string
-    ClientSideComponentProperties: any
-    ClientValidationFormula: any
-    ClientValidationMessage: any
-    CustomFormatter: any
-    DefaultFormula: any
-    DefaultValue: any
+    // ClientSideComponentProperties: any
+    // ClientValidationFormula: any
+    // ClientValidationMessage: any
+    // CustomFormatter: any
+    // DefaultFormula: any
+    // DefaultValue: any
     Description: string
     Direction: string
     EnforceUniqueValues: boolean
@@ -41,18 +41,18 @@ export interface IField {
     TypeAsString: FieldType
     TypeDisplayName: string
     TypeShortDescription: string
-    ValidationFormula: any
-    ValidationMessage: any
+    // ValidationFormula: any
+    // ValidationMessage: any
     EnableLookup?: boolean
     MaxLength?: number
     CommaSeparator?: boolean
-    CustomUnitName: any
+    // CustomUnitName: any
     CustomUnitOnRight?: boolean
     DisplayFormat?: DisplayFormat
     MaximumValue?: number
     MinimumValue?: number
     ShowAsPercentage?: boolean
-    Unit: any
+    // Unit: any
     AllowMultipleValues?: boolean
     DependentLookupInternalNames?: string[]
     IsDependentLookup?: boolean

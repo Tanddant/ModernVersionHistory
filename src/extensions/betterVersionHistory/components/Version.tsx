@@ -4,7 +4,6 @@ import { FieldUser } from './FieldUserPerson';
 import { Icon, Text, TooltipHost, PersonaSize, Link } from '@fluentui/react';
 import { FieldType } from '../models/FieldTypes';
 import { IFieldUrlValue, IFieldUserValue } from '../models/FieldValues';
-import ClampLines from 'react-clamp-lines';
 
 export interface IVersionProps {
     Version: IVersion;
@@ -29,9 +28,12 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
                             return <Text styles={{ root: { display: 'flex' } }}>{change.FieldName}:&nbsp;&nbsp;<FieldUser user={change.Data as IFieldUserValue} size={PersonaSize.size24} /></Text>
                         case FieldType.UserMulti:
                             return <Text styles={{ root: { display: 'flex' } }}>{change.FieldName}:&nbsp;&nbsp; {(change.Data as (IFieldUserValue[])).map(user => <FieldUser user={user} size={PersonaSize.size24} />)} </Text>
-                        case FieldType.URL:
+                        case FieldType.URL: {
                             const link = change.Data as IFieldUrlValue;
                             return <Text>{change.FieldName}: <Link href={link.Url} target='_blank'>{link.Description}</Link></Text>
+                        }
+                        case FieldType.Lookup:
+                            return <Text>{change.FieldName}: <Link href={change.Link} target='_blank'>{change.NewValue}</Link></Text>
                         default:
                             return <Text>{change.FieldName}: <TooltipHost content={change.OldValue}>{change.NewValue}</TooltipHost></Text>
                     }

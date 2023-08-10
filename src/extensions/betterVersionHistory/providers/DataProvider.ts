@@ -10,15 +10,15 @@ export interface IDataProvider {
 }
 
 export class DataProvider implements IDataProvider {
-    private _context: ListViewCommandSetContext;
-    private _SPFI: SPFI;
+    private _context: ListViewCommandSetContext = null;
+    private _SPFI: SPFI = null;
 
     constructor(context: ListViewCommandSetContext) {
         this._context = context;
     }
 
     private getSPFI(): SPFI {
-        if (this._SPFI == null)
+        if (this._SPFI === null)
             this._SPFI = spfi().using(SPFx(this._context));
         return this._SPFI;
     }
@@ -30,9 +30,9 @@ export class DataProvider implements IDataProvider {
 
         const versions = await this.getSPFI().web.lists.getById(this._context.pageContext.list.id.toString()).items.getById(this._context.listView.selectedRows[0].getValueByName("ID")).versions();
 
-        let Changes: IVersion[] = [];
+        const Changes: IVersion[] = [];
 
-        let fieldsToHandle: string[] = [];
+        const fieldsToHandle: string[] = [];
         for (let i = versions.length; i > 0; i--) {
             const version = versions[i - 1];
             const prevVersion = versions[i] ?? {};
@@ -44,8 +44,8 @@ export class DataProvider implements IDataProvider {
                 Changes: []
             };
 
-            for (let field of fields) {
-                if (this.fieldsToSkip.indexOf(field.StaticName) != -1)
+            for (const field of fields) {
+                if (this.fieldsToSkip.indexOf(field.StaticName) !== -1)
                     continue;
 
                 switch (field.TypeAsString) {
@@ -54,7 +54,7 @@ export class DataProvider implements IDataProvider {
                     case FieldType.Integer:
                     case FieldType.Number:
                     case FieldType.Choice:
-                        if (version[field.StaticName] != prevVersion[field.StaticName]) {
+                        if (version[field.StaticName] !== prevVersion[field.StaticName]) {
                             Version.Changes.push({
                                 FieldName: field.Title,
                                 FieldInternalName: field.StaticName,
@@ -66,20 +66,28 @@ export class DataProvider implements IDataProvider {
                         break;
                     case FieldType.Lookup:
                     case FieldType.User:
-                        if ((version[field.StaticName] as IFieldLookupValue)?.LookupId != (prevVersion[field.StaticName] as IFieldLookupValue)?.LookupId) {
+                        if ((version[field.StaticName] as IFieldLookupValue)?.LookupId !== (prevVersion[field.StaticName] as IFieldLookupValue)?.LookupId) {
+                            const link = new URL(this._context.pageContext.web.absoluteUrl)
+                            link.pathname += "/_layouts/15/listform.aspx";
+                            link.searchParams.append("PageType", "4");
+                            link.searchParams.append("ListId", field.LookupList);
+                            link.searchParams.append("ID", (version[field.StaticName] as IFieldLookupValue)?.LookupId.toString());
+                            link.searchParams.append("RootFolder", "*");
+  
                             Version.Changes.push({
                                 FieldName: field.Title,
                                 FieldInternalName: field.StaticName,
                                 OldValue: (prevVersion[field.StaticName] as IFieldLookupValue)?.LookupValue,
                                 NewValue: (version[field.StaticName] as IFieldLookupValue)?.LookupValue,
                                 FieldType: field.TypeAsString,
-                                Data: version[field.StaticName]
+                                Data: version[field.StaticName],
+                                Link: link.toString()
                             });
                         }
                         break;
                     case FieldType.DateTime:
-                        if (new Date(version[field.StaticName]).toLocaleString() != new Date(prevVersion[field.StaticName]).toLocaleString()) {
-                            if (field.DisplayFormat == DisplayFormat.DateOnly) {
+                        if (new Date(version[field.StaticName]).toLocaleString() !== new Date(prevVersion[field.StaticName]).toLocaleString()) {
+                            if (field.DisplayFormat === DisplayFormat.DateOnly) {
                                 Version.Changes.push({
                                     FieldName: field.Title,
                                     FieldInternalName: field.StaticName,
@@ -100,7 +108,7 @@ export class DataProvider implements IDataProvider {
                         break;
                     case FieldType.UserMulti:
                     case FieldType.LookupMulti:
-                        if (JSON.stringify(version[field.StaticName]) != JSON.stringify(prevVersion[field.StaticName])) {
+                        if (JSON.stringify(version[field.StaticName]) !== JSON.stringify(prevVersion[field.StaticName])) {
                             Version.Changes.push({
                                 FieldName: field.Title,
                                 FieldInternalName: field.StaticName,
@@ -109,10 +117,10 @@ export class DataProvider implements IDataProvider {
                                 FieldType: field.TypeAsString,
                                 Data: version[field.StaticName]
                             });
-                        };
+                        }
                         break;
                     case FieldType.MultiChoice:
-                        if (JSON.stringify(version[field.StaticName]) != JSON.stringify(prevVersion[field.StaticName])) {
+                        if (JSON.stringify(version[field.StaticName]) !== JSON.stringify(prevVersion[field.StaticName])) {
                             Version.Changes.push({
                                 FieldName: field.Title,
                                 FieldInternalName: field.StaticName,
@@ -121,12 +129,12 @@ export class DataProvider implements IDataProvider {
                                 FieldType: field.TypeAsString,
                                 Data: version[field.StaticName]
                             });
-                        };
+                        }
                         break;
-                    case FieldType.URL:
+                    case FieldType.URL: {
                         const BeforeUrlString = `${(prevVersion[field.StaticName] as IFieldUrlValue)?.Description} (${(prevVersion[field.StaticName] as IFieldUrlValue)?.Url})`;
                         const NewUrlString = `${(version[field.StaticName] as IFieldUrlValue).Description} (${(version[field.StaticName] as IFieldUrlValue).Url})`;
-                        if (BeforeUrlString != NewUrlString) {
+                        if (BeforeUrlString !== NewUrlString) {
                             Version.Changes.push({
                                 FieldName: field.Title,
                                 FieldInternalName: field.StaticName,
@@ -137,9 +145,9 @@ export class DataProvider implements IDataProvider {
                             });
                         }
                         break;
-
+                    }
                     case FieldType.Boolean:
-                        if (version[field.StaticName] != prevVersion[field.StaticName]) {
+                        if (version[field.StaticName] !== prevVersion[field.StaticName]) {
                             Version.Changes.push({
                                 FieldName: field.Title,
                                 FieldInternalName: field.StaticName,
@@ -150,7 +158,7 @@ export class DataProvider implements IDataProvider {
                         }
                         break;
                     default:
-                        if (fieldsToHandle.indexOf(field.TypeAsString) == -1)
+                        if (fieldsToHandle.indexOf(field.TypeAsString) === -1)
                             fieldsToHandle.push(field.TypeAsString);
                 }
             }

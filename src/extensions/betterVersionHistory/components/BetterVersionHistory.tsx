@@ -11,7 +11,7 @@ export interface IBetterVersionHistoryProps {
 }
 
 export const BetterVersionHistory: React.FunctionComponent<IBetterVersionHistoryProps> = (props: React.PropsWithChildren<IBetterVersionHistoryProps>) => {
-  const [versions, setVersions] = React.useState<IVersion[]>(null);
+  const [versions, setVersions] = React.useState<IVersion[] | null>(null);
 
   React.useEffect(() => {
     props.provider.GetVersions().then((versions) => {

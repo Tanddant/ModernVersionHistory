@@ -24,10 +24,12 @@ export const FieldUser: React.FunctionComponent<IFieldUserProps> = (props: React
                             hidePersonaDetails={props.hidePersonaDetails}
                             text={user.LookupValue}
                             secondaryText={user.Email}
+                            showInitialsUntilImageLoads={true}
                             imageUrl={`/_layouts/15/userphoto.aspx?Size=M&AccountName=${user.Email}`}
                         />
                     </>
                 }
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 serviceScope={context.serviceScope as any}
             />
         </>

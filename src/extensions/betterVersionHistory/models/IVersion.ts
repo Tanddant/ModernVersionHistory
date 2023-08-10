@@ -14,5 +14,7 @@ export interface IFieldChange {
     FieldType: FieldType;
     OldValue: string;
     NewValue: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Data?: any;
+    Link?: string;
 }

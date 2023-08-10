@@ -36,13 +36,14 @@ export default class BetterVersionHistoryCommandSet extends BaseListViewCommandS
 
   public onExecute(event: IListViewCommandSetExecuteEventParameters): void {
     switch (event.itemId) {
-      case 'COMMAND_1':
-        const element = React.createElement(BetterVersionHistory, { close: null, provider: new DataProvider(this.context) } as IBetterVersionHistoryProps);
+      case 'COMMAND_1': {
+        const element = React.createElement(BetterVersionHistory, { close: () => {console.error() }, provider: new DataProvider(this.context) } as IBetterVersionHistoryProps);
         const context = React.createElement(SPFxContext.Provider, { value: { context: this.context } }, element);
         const wrapper = new DialogWrapper(context);
         element.props.close = () => wrapper.close();
-        wrapper.show();
+        wrapper.show().catch(er => alert(er));
         break;
+      }
       default:
         throw new Error('Unknown command');
     }
@@ -56,7 +57,7 @@ export default class BetterVersionHistoryCommandSet extends BaseListViewCommandS
       // This command should be hidden unless exactly one row is selected.
       compareOneCommand.visible = this.context.listView.selectedRows?.length === 1;
     }
-    
+
     this.raiseOnChange();
   }
 }
