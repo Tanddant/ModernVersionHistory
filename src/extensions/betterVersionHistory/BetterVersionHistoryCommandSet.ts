@@ -37,10 +37,9 @@ export default class BetterVersionHistoryCommandSet extends BaseListViewCommandS
   public onExecute(event: IListViewCommandSetExecuteEventParameters): void {
     switch (event.itemId) {
       case 'COMMAND_1': {
-        const element = React.createElement(BetterVersionHistory, { close: () => {console.error() }, provider: new DataProvider(this.context) } as IBetterVersionHistoryProps);
+        const element = React.createElement(BetterVersionHistory, { provider: new DataProvider(this.context) } as IBetterVersionHistoryProps);
         const context = React.createElement(SPFxContext.Provider, { value: { context: this.context } }, element);
         const wrapper = new DialogWrapper(context);
-        element.props.close = () => wrapper.close();
         wrapper.show().catch(er => alert(er));
         break;
       }

@@ -6,7 +6,6 @@ import { Version } from './Version';
 import styles from './BetterVersionHistory.module.scss';
 
 export interface IBetterVersionHistoryProps {
-  close: () => void;
   provider: IDataProvider;
 }
 

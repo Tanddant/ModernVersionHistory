@@ -14,9 +14,11 @@ export default class DialogWrapper<T> extends BaseDialog {
         ReactDOM.render(this.element, this.domElement);
     }
 
-    public close(): Promise<void> {
-        return super.close().then(() => {
-            ReactDOM.unmountComponentAtNode(this.domElement);
-        });
-    }
+    protected onAfterClose(): void {
+        super.onAfterClose();
+    
+        // Clean up the element for the next dialog
+        ReactDOM.unmountComponentAtNode(this.domElement);
+      }
+
 }
