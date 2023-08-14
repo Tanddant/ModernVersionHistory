@@ -22,8 +22,6 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
                 </div>
                 {Version.Changes.map((change) => {
                     switch (change.FieldType) {
-                        case FieldType.Note:
-                            return <Text>{change.FieldName}: {change.NewValue}</Text>;
                         case FieldType.User:
                             return <Text styles={{ root: { display: 'flex' } }}>{change.FieldName}:&nbsp;&nbsp;<FieldUser user={change.Data as IFieldUserValue} size={PersonaSize.size24} /></Text>
                         case FieldType.UserMulti:
