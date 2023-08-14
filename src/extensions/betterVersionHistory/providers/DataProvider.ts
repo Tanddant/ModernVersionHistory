@@ -3,7 +3,7 @@ import { SPFx, SPFI, spfi } from "@pnp/sp/presets/all";
 import { IField } from "../models/IField";
 import { IVersion } from "../models/IVersion";
 import { DisplayFormat, FieldType } from "../models/FieldTypes";
-import { IFieldLookupValue, IFieldUrlValue } from "../models/FieldValues";
+import { IFieldLookupValue, IFieldUrlValue, ITaxonomyFieldValue } from "../models/FieldValues";
 
 export interface IDataProvider {
     GetVersions(): Promise<IVersion[]>
@@ -26,7 +26,6 @@ export class DataProvider implements IDataProvider {
     private fieldsToSkip: string[] = ["Modified", "Created"];
     public async GetVersions(): Promise<IVersion[]> {
         const fields = await this.GetFields(this._context.pageContext.list.id.toString());
-        console.log(fields);
 
         const versions = await this.getSPFI().web.lists.getById(this._context.pageContext.list.id.toString()).items.getById(this._context.listView.selectedRows[0].getValueByName("ID")).versions();
 
@@ -73,7 +72,7 @@ export class DataProvider implements IDataProvider {
                             link.searchParams.append("ListId", field.LookupList);
                             link.searchParams.append("ID", (version[field.StaticName] as IFieldLookupValue)?.LookupId.toString());
                             link.searchParams.append("RootFolder", "*");
-  
+
                             Version.Changes.push({
                                 FieldName: field.Title,
                                 FieldInternalName: field.StaticName,
@@ -157,6 +156,30 @@ export class DataProvider implements IDataProvider {
                             });
                         }
                         break;
+                    case FieldType.Taxonomy:
+                        if (JSON.stringify(version[field.StaticName]) !== JSON.stringify(prevVersion[field.StaticName])) {
+                            Version.Changes.push({
+                                FieldName: field.Title,
+                                FieldInternalName: field.StaticName,
+                                OldValue: (prevVersion[field.StaticName] as ITaxonomyFieldValue)?.Label,
+                                NewValue: (version[field.StaticName] as ITaxonomyFieldValue)?.Label,
+                                FieldType: field.TypeAsString,
+                                Data: version[field.StaticName]
+                            });
+                        }
+                        break;
+                    case FieldType.TaxonomyMulti:
+                        if (JSON.stringify(version[field.StaticName]) !== JSON.stringify(prevVersion[field.StaticName])) {
+                            Version.Changes.push({
+                                FieldName: field.Title,
+                                FieldInternalName: field.StaticName,
+                                OldValue: (prevVersion[field.StaticName] as ITaxonomyFieldValue[])?.map(x => x.Label).join("\n"),
+                                NewValue: (version[field.StaticName] as ITaxonomyFieldValue[])?.map(x => x.Label).join("\n"),
+                                FieldType: field.TypeAsString,
+                                Data: version[field.StaticName]
+                            });
+                        }
+                        break;
                     default:
                         if (fieldsToHandle.indexOf(field.TypeAsString) === -1)
                             fieldsToHandle.push(field.TypeAsString);
@@ -168,7 +191,6 @@ export class DataProvider implements IDataProvider {
 
         Changes.reverse();
 
-        console.log(fieldsToHandle);
         return Changes;
     }
 

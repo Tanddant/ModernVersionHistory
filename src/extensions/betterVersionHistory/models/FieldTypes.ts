@@ -16,6 +16,8 @@ export enum FieldType {
     User = "User",
     UserMulti = "UserMulti",
     ContentTypeId = "ContentTypeId",
+    Taxonomy = "TaxonomyFieldType",
+    TaxonomyMulti = "TaxonomyFieldTypeMulti",
 }
 
 export enum DisplayFormat {

@@ -11,3 +11,10 @@ export interface IFieldUrlValue {
     Description: string;
     Url: string;
 }
+
+export interface ITaxonomyFieldValue {
+    Label: string
+    TermGuid: string
+    WssId: number
+  }
+  
