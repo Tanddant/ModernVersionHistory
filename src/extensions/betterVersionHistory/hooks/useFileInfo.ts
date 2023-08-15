@@ -5,9 +5,8 @@ import { IFileInfo } from "@pnp/sp/files";
 export default function useFileInfo(provider: IDataProvider): { fileInfo: IFileInfo } {
   const [selectedFile, setSelectedFile] = useState<IFileInfo>(undefined);
 
-  async function fetchFileInfo() {
+  async function fetchFileInfo(): Promise<void> {
     const file = await provider.GetFileInfo();
-    console.log(file);
     setSelectedFile(file);
   }
 
