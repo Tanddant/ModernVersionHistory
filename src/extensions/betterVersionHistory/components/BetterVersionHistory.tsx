@@ -19,7 +19,7 @@ export const BetterVersionHistory: React.FunctionComponent<IBetterVersionHistory
   if (isLoading) return (<Spinner label='Loading versions...' size={SpinnerSize.large} />);
 
   return (
-    <DialogContent styles={{ content: { maxHeight: "50vh", maxWidth: 800, overflowY: "scroll" } }} title={"Better version history"}>
+    <DialogContent styles={{ content: { maxHeight: "50vh", width: "50vw", overflowY: "scroll" } }} title={"Better version history"}>
       <Stack horizontal tokens={{ childrenGap: 10 }}>
         <DatePicker label='Start date' value={filters.StartDate} onSelectDate={date => setFilters({ StartDate: date })} styles={{ root: { flexGrow: 1 } }} />
         <DatePicker label='End date' value={filters.EndDate} onSelectDate={date => setFilters({ EndDate: date })} styles={{ root: { flexGrow: 1 } }} />
