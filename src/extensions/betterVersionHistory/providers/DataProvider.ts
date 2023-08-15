@@ -1,5 +1,5 @@
 import { ListViewCommandSetContext } from "@microsoft/sp-listview-extensibility";
-import { SPFx, SPFI, spfi } from "@pnp/sp/presets/all";
+import { SPFx, SPFI, spfi, IFileInfo } from "@pnp/sp/presets/all";
 import { IField } from "../models/IField";
 import { IVersion } from "../models/IVersion";
 import { GetChanges } from "../models/FieldValues";
@@ -7,6 +7,7 @@ import { IVersionsFilter } from "../models/IVersionsFilter";
 
 export interface IDataProvider {
     GetVersions(filters: IVersionsFilter): Promise<IVersion[]>
+    GetFileInfo(): Promise<IFileInfo>;
 }
 
 export class DataProvider implements IDataProvider {
@@ -71,6 +72,11 @@ export class DataProvider implements IDataProvider {
         Changes.reverse();
 
         return Changes;
+    }
+
+    public async GetFileInfo(): Promise<IFileInfo> {
+        const item = this.getSPFI().web.lists.getById(this._context.pageContext.list.id.toString()).items.getById(this._context.listView.selectedRows[0].getValueByName("ID"));
+        return await item.file();
     }
 
     private async GetFields(listId: string): Promise<IField[]> {
