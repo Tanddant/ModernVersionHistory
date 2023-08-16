@@ -24,22 +24,25 @@ export class DataProvider implements IDataProvider {
         return this._SPFI;
     }
 
-    
+
     private fieldsToSkip: string[] = ["Modified", "Created"];
     public async GetVersions(filters: IVersionsFilter): Promise<IVersion[]> {
         const fields = await this.GetFields(this._context.pageContext.list.id.toString());
 
         const filterQueries: string[] = [];
 
-        if(filters.StartDate !== undefined)
+        if (filters.StartDate !== undefined)
             filterQueries.push(`Created ge datetime'${filters.StartDate.toISOString()}'`);
 
-        if(filters.EndDate !== undefined)
+        if (filters.EndDate !== undefined)
             filterQueries.push(`Created le datetime'${filters.EndDate.toISOString()}'`);
+
+        if (filters.Author !== undefined)
+            filterQueries.push(`(Editor/Email eq '${filters.Author.secondaryText}')`);
 
         const endpoint = this.getSPFI().web.lists.getById(this._context.pageContext.list.id.toString()).items.getById(this._context.listView.selectedRows[0].getValueByName("ID")).versions;
 
-        if(filterQueries.length > 0)
+        if (filterQueries.length > 0)
             endpoint.filter(filterQueries.join(" and "));
 
         const versions = await endpoint();
