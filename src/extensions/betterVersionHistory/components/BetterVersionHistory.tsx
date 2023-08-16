@@ -7,6 +7,7 @@ import useVersions from '../hooks/useVersion';
 import { IVersionsFilter } from '../models/IVersionsFilter';
 import useObject from '../hooks/useObject';
 import useFileInfo from '../hooks/useFileInfo';
+import { PeoplePicker } from './PeoplePicker';
 
 export interface IBetterVersionHistoryProps {
   provider: IDataProvider;
@@ -23,6 +24,9 @@ export const BetterVersionHistory: React.FunctionComponent<IBetterVersionHistory
       <Stack horizontal tokens={{ childrenGap: 10 }}>
         <DatePicker label='Start date' value={filters.StartDate} onSelectDate={date => setFilters({ StartDate: date })} styles={{ root: { flexGrow: 1 } }} />
         <DatePicker label='End date' value={filters.EndDate} onSelectDate={date => setFilters({ EndDate: date })} styles={{ root: { flexGrow: 1 } }} />
+        <Stack styles={{ root: { flexGrow: 1 } }}>
+          <PeoplePicker versions={versions} onContributorSelected={(userPersonaProps) => setFilters({ Author: userPersonaProps })} />
+        </Stack>
       </Stack>
       <Stack>
         {versions.map((version) => <Version Version={version} className={styles.test} />)}
