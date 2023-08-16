@@ -1,5 +1,5 @@
 import { ListViewCommandSetContext } from "@microsoft/sp-listview-extensibility";
-import { SPFx, SPFI, spfi } from "@pnp/sp/presets/all";
+import { SPFx, SPFI, spfi, IFileInfo } from "@pnp/sp/presets/all";
 import { IField } from "../models/IField";
 import { IVersion } from "../models/IVersion";
 import { GetChanges } from "../models/FieldValues";
@@ -7,6 +7,7 @@ import { IVersionsFilter } from "../models/IVersionsFilter";
 
 export interface IDataProvider {
     GetVersions(filters: IVersionsFilter): Promise<IVersion[]>
+    GetFileInfo(): Promise<IFileInfo>;
 }
 
 export class DataProvider implements IDataProvider {
@@ -23,22 +24,22 @@ export class DataProvider implements IDataProvider {
         return this._SPFI;
     }
 
-    
+
     private fieldsToSkip: string[] = ["Modified", "Created"];
     public async GetVersions(filters: IVersionsFilter): Promise<IVersion[]> {
         const fields = await this.GetFields(this._context.pageContext.list.id.toString());
 
         const filterQueries: string[] = [];
 
-        if(filters.StartDate !== undefined)
+        if (filters.StartDate !== undefined)
             filterQueries.push(`Created ge datetime'${filters.StartDate.toISOString()}'`);
 
-        if(filters.EndDate !== undefined)
+        if (filters.EndDate !== undefined)
             filterQueries.push(`Created le datetime'${filters.EndDate.toISOString()}'`);
 
         const endpoint = this.getSPFI().web.lists.getById(this._context.pageContext.list.id.toString()).items.getById(this._context.listView.selectedRows[0].getValueByName("ID")).versions;
 
-        if(filterQueries.length > 0)
+        if (filterQueries.length > 0)
             endpoint.filter(filterQueries.join(" and "));
 
         const versions = await endpoint();
@@ -71,6 +72,11 @@ export class DataProvider implements IDataProvider {
         Changes.reverse();
 
         return Changes;
+    }
+
+    public async GetFileInfo(): Promise<IFileInfo> {
+        const item = this.getSPFI().web.lists.getById(this._context.pageContext.list.id.toString()).items.getById(this._context.listView.selectedRows[0].getValueByName("ID"));
+        return await item.file();
     }
 
     private async GetFields(listId: string): Promise<IField[]> {

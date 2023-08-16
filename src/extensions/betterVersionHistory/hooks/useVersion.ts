@@ -7,7 +7,11 @@ export default function useVersions(provider: IDataProvider, filters: IVersionsF
     const [versions, setVersions] = useState<IVersion[]>(null);
 
     async function fetchData(): Promise<void> {
-        const result = await provider.GetVersions(filters);
+        let result = await provider.GetVersions(filters);
+        // as the provider does NOT filter by 'Editor' (aka Contributor) we will do this on client side
+        if (filters.Author) { 
+            result = result.filter(v => v.Author.Email === filters.Author?.secondaryText);
+        }
         setVersions(result);
     }
 
