@@ -10,7 +10,7 @@ export default function useVersions(provider: IDataProvider, filters: IVersionsF
         const result = await provider.GetVersions(filters);
         setVersions(result);
     }
-
+    
     useEffect(() => {
         fetchData();
     }, [filters]);
