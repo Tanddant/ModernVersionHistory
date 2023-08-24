@@ -12,7 +12,7 @@ A modern UI version of the traditional version history page for SharePoint lists
 - [x] See who changed what, and when
 - [x] Filter by date range
 - [x] Filter by user
-- [ ] Compare two different versions
+- [x] Compare two different versions
 - [ ] Restore a previous version
 - [ ] View the full version
 - [ ] Approver (and comments)

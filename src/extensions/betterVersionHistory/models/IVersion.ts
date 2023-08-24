@@ -6,6 +6,7 @@ export interface IVersion {
     Author: IFieldUserValue;
     TimeStamp: Date;
     Changes: IFieldChange[];
+    VersionId: number;
 }
 
 export interface IFieldChange {

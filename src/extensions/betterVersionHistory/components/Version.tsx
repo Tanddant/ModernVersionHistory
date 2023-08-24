@@ -1,19 +1,22 @@
 import * as React from 'react';
 import { IVersion } from '../models/IVersion';
 import { FieldUser } from './FieldUserPerson';
-import { Icon, Text, TooltipHost, PersonaSize, Link } from '@fluentui/react';
+import { Icon, Text, TooltipHost, PersonaSize, Link, Checkbox } from '@fluentui/react';
 import { FieldType } from '../models/FieldTypes';
 import { IFieldUrlValue, IFieldUserValue } from '../models/FieldValues';
 
 export interface IVersionProps {
     Version: IVersion;
     className: string;
+    selectedVersions?: number[];
+    onVersionSelected?: () => void;
 }
 
 export const Version: React.FunctionComponent<IVersionProps> = (props: React.PropsWithChildren<IVersionProps>) => {
     const { Version } = props;
     return (
         <div style={{ display: "flex", padding: 10 }} className={props.className}>
+            <Checkbox checked={props.selectedVersions.indexOf(Version.VersionId) > -1} onChange={(e, checked) => props.onVersionSelected()} />&nbsp;
             <FieldUser user={Version.Author} hidePersonaDetails />
             <div style={{ display: "flex", flexDirection: "column", marginLeft: "1em", flexGrow: 1 }}>
                 <div>

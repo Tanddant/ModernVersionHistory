@@ -37,6 +37,9 @@ export class DataProvider implements IDataProvider {
         if (filters.EndDate !== undefined)
             filterQueries.push(`Created le datetime'${filters.EndDate.toISOString()}'`);
 
+        if (filters.VersionNumbers !== undefined && filters.VersionNumbers.length > 0)
+            filterQueries.push(`(${filters.VersionNumbers.map(v => `VersionId eq ${v}`).join(" or ")})`);
+
         const endpoint = this.getSPFI().web.lists.getById(this._context.pageContext.list.id.toString()).items.getById(this._context.listView.selectedRows[0].getValueByName("ID")).versions;
 
         if (filterQueries.length > 0)
@@ -54,7 +57,8 @@ export class DataProvider implements IDataProvider {
                 VersionName: version.VersionLabel,
                 Author: version.Editor,
                 TimeStamp: new Date(version.Created),
-                Changes: []
+                Changes: [],
+                VersionId: version.VersionId
             };
 
             for (const field of fields) {

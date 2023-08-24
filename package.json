@@ -14,6 +14,7 @@
   "dependencies": {
     "@fluentui/react": "^7.204.0",
     "@microsoft/decorators": "1.17.4",
+    "@microsoft/generator-sharepoint": "1.17.4",
     "@microsoft/sp-core-library": "1.17.4",
     "@microsoft/sp-dialog": "1.17.4",
     "@microsoft/sp-listview-extensibility": "1.17.4",
