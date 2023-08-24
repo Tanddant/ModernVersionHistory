@@ -7,6 +7,7 @@ export interface IVersion {
     TimeStamp: Date;
     Changes: IFieldChange[];
     VersionId: number;
+    VersionLink: string;
 }
 
 export interface IFieldChange {

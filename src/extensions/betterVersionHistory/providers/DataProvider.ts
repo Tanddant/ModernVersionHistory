@@ -53,12 +53,28 @@ export class DataProvider implements IDataProvider {
             const version = versions[i - 1];
             const prevVersion = versions[i] ?? {};
 
+
+            const FileLink = new URL(`${this._context.pageContext.web.absoluteUrl}/_layouts/15/versions.appx`);
+            FileLink.searchParams.append("FileName", version.FileRef);
+            FileLink.searchParams.append("list", this._context.pageContext.list.id.toString());
+            FileLink.searchParams.append("ID", this._context.listView.selectedRows[0].getValueByName("ID"));
+            FileLink.searchParams.append("col", "Number");
+            //Todo: Add support
+            // FileLink.searchParams.append("op", "Delete");
+            // FileLink.searchParams.append("op", "Restore");
+            FileLink.searchParams.append("ver", version.VersionId);
+            FileLink.searchParams.append("IsDlg", "1");
+
+            console.log(version.VersionLabel);
+            console.log(FileLink.toString());
+
             const Version: IVersion = {
                 VersionName: version.VersionLabel,
                 Author: version.Editor,
                 TimeStamp: new Date(version.Created),
                 Changes: [],
-                VersionId: version.VersionId
+                VersionId: version.VersionId,
+                VersionLink: `${this._context.pageContext.list.serverRelativeUrl}/DispForm.aspx?ID=${this._context.listView.selectedRows[0].getValueByName("ID")}&VersionNo=${version.VersionId}`,
             };
 
             for (const field of fields) {

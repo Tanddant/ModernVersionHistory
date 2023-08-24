@@ -4,6 +4,7 @@ import { FieldUser } from './FieldUserPerson';
 import { Icon, Text, TooltipHost, PersonaSize, Link, Checkbox } from '@fluentui/react';
 import { FieldType } from '../models/FieldTypes';
 import { IFieldUrlValue, IFieldUserValue } from '../models/FieldValues';
+import { ActionButton } from 'office-ui-fabric-react';
 
 export interface IVersionProps {
     Version: IVersion;
@@ -22,6 +23,7 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
                 <div>
                     <Icon iconName="EditContact" />&nbsp;
                     <Text variant='medium' styles={{ root: { fontWeight: "bold" } }}>Version: {Version.VersionName}</Text>
+                    <ActionButton iconProps={{ iconName: "EntryView" }} text="View version" href={Version.VersionLink} target="_blank" />
                 </div>
                 {Version.Changes.map((change) => {
                     switch (change.FieldType) {
