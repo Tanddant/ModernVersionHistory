@@ -75,7 +75,6 @@ export class DataProvider implements IDataProvider {
                 // VersionLink: `${this._context.pageContext.list.serverRelativeUrl}/DispForm.aspx?ID=${this._context.listView.selectedRows[0].getValueByName("ID")}&VersionNo=${version.VersionId}`,
                 VersionLink: encodeURI(`${this._context.pageContext.site.absoluteUrl}` + (version.IsCurrentVersion ? version.FileRef : `/_vti_history/${version.VersionId}${version.FileRef}`)),
             };
-            console.log(Version);
 
             for (const field of fields) {
                 if (this.fieldsToSkip.indexOf(field.StaticName) !== -1)
