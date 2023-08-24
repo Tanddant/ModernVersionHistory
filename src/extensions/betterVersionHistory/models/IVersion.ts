@@ -8,6 +8,7 @@ export interface IVersion {
     Changes: IFieldChange[];
     VersionId: number;
     VersionLink: string;
+    Lifecycle?: IDocumentLifecycleInfo;
 }
 
 export interface IFieldChange {
@@ -19,4 +20,11 @@ export interface IFieldChange {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Data?: any;
     Link?: string;
+}
+
+export interface IDocumentLifecycleInfo {
+    CheckinComment?: string;
+    ModerationStatus?: number;
+    ModerationComments?: string;
+
 }
