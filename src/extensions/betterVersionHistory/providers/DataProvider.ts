@@ -24,7 +24,6 @@ export class DataProvider implements IDataProvider {
         return this._SPFI;
     }
 
-
     private fieldsToSkip: string[] = ["Modified", "Created"];
     public async GetVersions(filters: IVersionsFilter): Promise<IVersion[]> {
         const fields = await this.GetFields(this._context.pageContext.list.id.toString());
@@ -41,7 +40,6 @@ export class DataProvider implements IDataProvider {
             filterQueries.push(`(${filters.VersionNumbers.map(v => `VersionId eq ${v}`).join(" or ")})`);
 
         const endpoint = this.getSPFI().web.lists.getById(this._context.pageContext.list.id.toString()).items.getById(this._context.listView.selectedRows[0].getValueByName("ID")).versions;
-
         if (filterQueries.length > 0)
             endpoint.filter(filterQueries.join(" and "));
 
@@ -74,8 +72,10 @@ export class DataProvider implements IDataProvider {
                 TimeStamp: new Date(version.Created),
                 Changes: [],
                 VersionId: version.VersionId,
-                VersionLink: `${this._context.pageContext.list.serverRelativeUrl}/DispForm.aspx?ID=${this._context.listView.selectedRows[0].getValueByName("ID")}&VersionNo=${version.VersionId}`,
+                // VersionLink: `${this._context.pageContext.list.serverRelativeUrl}/DispForm.aspx?ID=${this._context.listView.selectedRows[0].getValueByName("ID")}&VersionNo=${version.VersionId}`,
+                VersionLink: encodeURI(`${this._context.pageContext.site.absoluteUrl}` + (version.IsCurrentVersion ? version.FileRef : `/_vti_history/${version.VersionId}${version.FileRef}`)),
             };
+            console.log(Version);
 
             for (const field of fields) {
                 if (this.fieldsToSkip.indexOf(field.StaticName) !== -1)
@@ -96,6 +96,7 @@ export class DataProvider implements IDataProvider {
 
     public async GetFileInfo(): Promise<IFileInfo> {
         const item = this.getSPFI().web.lists.getById(this._context.pageContext.list.id.toString()).items.getById(this._context.listView.selectedRows[0].getValueByName("ID"));
+
         return await item.file();
     }
 

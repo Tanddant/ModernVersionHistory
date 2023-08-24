@@ -44,7 +44,6 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
 
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                     <Text variant='small' styles={{ root: { backgroundColor: "lightgrey", borderRadius: 3, padding: "0.25em" } }}>{Version.Author.LookupValue}</Text>
-
                     <Text variant='small'>{Version.TimeStamp.toLocaleString()}</Text>
                 </div>
             </div>
