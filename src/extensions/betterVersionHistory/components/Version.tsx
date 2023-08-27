@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { IVersion } from '../models/IVersion';
 import { FieldUser } from './FieldUserPerson';
-import { Icon, Text, TooltipHost, PersonaSize, Link, Checkbox } from '@fluentui/react';
+import { Icon, Text, TooltipHost, PersonaSize, Link, Checkbox, Stack, StackItem } from '@fluentui/react';
 import { FieldType } from '../models/FieldTypes';
 import { IFieldUrlValue, IFieldUserValue } from '../models/FieldValues';
 import { ActionButton } from 'office-ui-fabric-react';
@@ -25,6 +25,26 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
                     <Text variant='medium' styles={{ root: { fontWeight: "bold" } }}>Version: {Version.VersionName}</Text>
                     <ActionButton iconProps={{ iconName: "EntryView" }} text="View version" href={Version.VersionLink} target="_blank" />
                 </div>
+                <div>
+                    {Version.Lifecycle &&
+                        <Stack>
+                            {Version.Lifecycle.ModerationStatus >= 0 &&
+                                <StackItem>
+                                    {Version.Lifecycle.ModerationStatus == 0 && <><Icon iconName="FileComment" style={{ color: 'darkgreen' }} title='Document approved' />&nbsp;Approved</>}
+                                    {Version.Lifecycle.ModerationStatus == 1 && <><Icon iconName="FileComment" style={{ color: 'darkred' }} title='Document approval rejected' />&nbsp;Rejected</>}
+                                    {Version.Lifecycle.ModerationStatus == 2 && <><Icon iconName="FileComment" title='Document approval pending' />&nbsp;Pending</>}
+                                    {Version.Lifecycle.ModerationComments && <Text variant='medium'> &middot; {Version.Lifecycle.ModerationComments}</Text>}
+                                </StackItem>
+                            }
+                            {Version.Lifecycle.CheckinComment &&
+                                <StackItem>
+                                    <Icon iconName="PageCheckedin" title='Document Status Information' />&nbsp;
+                                    <Text variant='medium'>{Version.Lifecycle.CheckinComment}</Text>
+                                </StackItem>
+                            }
+                        </Stack>
+                    }
+                </div>
                 {Version.Changes.map((change) => {
                     switch (change.FieldType) {
                         case FieldType.User:
@@ -44,7 +64,6 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
 
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                     <Text variant='small' styles={{ root: { backgroundColor: "lightgrey", borderRadius: 3, padding: "0.25em" } }}>{Version.Author.LookupValue}</Text>
-
                     <Text variant='small'>{Version.TimeStamp.toLocaleString()}</Text>
                 </div>
             </div>

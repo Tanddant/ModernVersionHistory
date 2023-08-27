@@ -24,7 +24,6 @@ export class DataProvider implements IDataProvider {
         return this._SPFI;
     }
 
-
     private fieldsToSkip: string[] = ["Modified", "Created"];
     public async GetVersions(filters: IVersionsFilter): Promise<IVersion[]> {
         const fields = await this.GetFields(this._context.pageContext.list.id.toString());
@@ -41,18 +40,15 @@ export class DataProvider implements IDataProvider {
             filterQueries.push(`(${filters.VersionNumbers.map(v => `VersionId eq ${v}`).join(" or ")})`);
 
         const endpoint = this.getSPFI().web.lists.getById(this._context.pageContext.list.id.toString()).items.getById(this._context.listView.selectedRows[0].getValueByName("ID")).versions;
-
         if (filterQueries.length > 0)
             endpoint.filter(filterQueries.join(" and "));
 
         const versions = await endpoint();
-
         const Changes: IVersion[] = [];
 
         for (let i = versions.length; i > 0; i--) {
             const version = versions[i - 1];
             const prevVersion = versions[i] ?? {};
-
 
             const FileLink = new URL(`${this._context.pageContext.web.absoluteUrl}/_layouts/15/versions.appx`);
             FileLink.searchParams.append("FileName", version.FileRef);
@@ -68,13 +64,20 @@ export class DataProvider implements IDataProvider {
             console.log(version.VersionLabel);
             console.log(FileLink.toString());
 
+            const fileVersionMetadata = (version.FSObjType && !version.IsCurrentVersion) ? await this.GetFileVersionMetadata(version.FileRef, version.VersionLabel) : undefined;
             const Version: IVersion = {
                 VersionName: version.VersionLabel,
                 Author: version.Editor,
                 TimeStamp: new Date(version.Created),
                 Changes: [],
                 VersionId: version.VersionId,
-                VersionLink: `${this._context.pageContext.list.serverRelativeUrl}/DispForm.aspx?ID=${this._context.listView.selectedRows[0].getValueByName("ID")}&VersionNo=${version.VersionId}`,
+                // VersionLink: `${this._context.pageContext.list.serverRelativeUrl}/DispForm.aspx?ID=${this._context.listView.selectedRows[0].getValueByName("ID")}&VersionNo=${version.VersionId}`,
+                VersionLink: encodeURI(`${this._context.pageContext.site.absoluteUrl}` + (version.IsCurrentVersion ? version.FileRef : `/_vti_history/${version.VersionId}${version.FileRef}`)),
+                Lifecycle: {
+                    CheckinComment: (fileVersionMetadata ? fileVersionMetadata.CheckInComment : version['OData__x005f_CheckinComment']) ?? '',
+                    ModerationStatus: (version['OData__x005f_ModerationStatus'] >= 0 ? version['OData__x005f_ModerationStatus'] : undefined),
+                    ModerationComments: (version['OData__x005f_ModerationStatus'] >= 0 ? version['OData__x005f_ModerationComments'] : ''),    
+                }
             };
 
             for (const field of fields) {
@@ -96,10 +99,16 @@ export class DataProvider implements IDataProvider {
 
     public async GetFileInfo(): Promise<IFileInfo> {
         const item = this.getSPFI().web.lists.getById(this._context.pageContext.list.id.toString()).items.getById(this._context.listView.selectedRows[0].getValueByName("ID"));
+
         return await item.file();
     }
 
     private async GetFields(listId: string): Promise<IField[]> {
         return this.getSPFI().web.lists.getById(listId).fields.filter("Hidden eq false")();
+    }
+
+    private async GetFileVersionMetadata(fileRef: string, versionLabel: number): Promise<IFileInfo> {
+        return (await this.getSPFI().web.getFileByServerRelativePath(fileRef).versions())
+            .filter(v => v.VersionLabel === versionLabel)[0];
     }
 }

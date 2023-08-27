@@ -15,7 +15,7 @@ A modern UI version of the traditional version history page for SharePoint lists
 - [x] Compare two different versions
 - [ ] Restore a previous version
 - [x] View the full version
-- [ ] Approver (and comments)
+- [x] Approver (and comments)
 - [ ] Show only changes to specific fields
 - [ ] Show only changes to specific fields by specific users
 
