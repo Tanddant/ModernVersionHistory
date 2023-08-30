@@ -4,13 +4,9 @@ import { IField } from "../models/IField";
 import { IVersion } from "../models/IVersion";
 import { GetChanges } from "../models/FieldValues";
 import { IVersionsFilter } from "../models/IVersionsFilter";
+import { IDataProvider } from "../models/IDataProvider";
 
-export interface IDataProvider {
-    GetVersions(filters: IVersionsFilter): Promise<IVersion[]>
-    GetFileInfo(): Promise<IFileInfo>;
-}
-
-export class DataProvider implements IDataProvider {
+export class SPODataProvider implements IDataProvider {
     private _context: ListViewCommandSetContext = null;
     private _SPFI: SPFI = null;
 
@@ -74,9 +70,11 @@ export class DataProvider implements IDataProvider {
                 // VersionLink: `${this._context.pageContext.list.serverRelativeUrl}/DispForm.aspx?ID=${this._context.listView.selectedRows[0].getValueByName("ID")}&VersionNo=${version.VersionId}`,
                 VersionLink: encodeURI(`${this._context.pageContext.site.absoluteUrl}` + (version.IsCurrentVersion ? version.FileRef : `/_vti_history/${version.VersionId}${version.FileRef}`)),
                 Lifecycle: {
+                    /* eslint-disable */
                     CheckinComment: (fileVersionMetadata ? fileVersionMetadata.CheckInComment : version['OData__x005f_CheckinComment']) ?? '',
                     ModerationStatus: (version['OData__x005f_ModerationStatus'] >= 0 ? version['OData__x005f_ModerationStatus'] : undefined),
-                    ModerationComments: (version['OData__x005f_ModerationStatus'] >= 0 ? version['OData__x005f_ModerationComments'] : ''),    
+                    ModerationComments: (version['OData__x005f_ModerationStatus'] >= 0 ? version['OData__x005f_ModerationComments'] : ''),
+                    /* eslint-enable */
                 }
             };
 

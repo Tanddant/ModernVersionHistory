@@ -9,7 +9,7 @@ import { BetterVersionHistory, IBetterVersionHistoryProps } from './components/B
 import DialogWrapper from './components/DialogWrapper';
 import * as React from 'react';
 import { getThemeColor } from './themeHelper';
-import { DataProvider } from './providers/DataProvider';
+import { SPODataProvider } from './providers/SPODataProvider';
 import { SPFxContext } from './contexts/SPFxContext';
 
 export interface IBetterVersionHistoryCommandSetProperties { }
@@ -37,7 +37,7 @@ export default class BetterVersionHistoryCommandSet extends BaseListViewCommandS
   public onExecute(event: IListViewCommandSetExecuteEventParameters): void {
     switch (event.itemId) {
       case 'COMMAND_1': {
-        const element = React.createElement(BetterVersionHistory, { provider: new DataProvider(this.context) } as IBetterVersionHistoryProps);
+        const element = React.createElement(BetterVersionHistory, { provider: new SPODataProvider(this.context) } as IBetterVersionHistoryProps);
         const context = React.createElement(SPFxContext.Provider, { value: { context: this.context } }, element);
         const wrapper = new DialogWrapper(context);
         wrapper.show().catch(er => alert(er));

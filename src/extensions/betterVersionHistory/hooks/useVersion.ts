@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { IDataProvider } from '../providers/DataProvider';
 import { IVersion } from '../models/IVersion';
 import { IVersionsFilter } from '../models/IVersionsFilter';
+import { IDataProvider } from '../models/IDataProvider';
 
 export default function useVersions(provider: IDataProvider, filters: IVersionsFilter = {}): { versions: IVersion[], isLoading: boolean } {
     const [versions, setVersions] = useState<IVersion[]>(null);
