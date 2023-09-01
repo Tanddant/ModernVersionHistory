@@ -9,6 +9,7 @@ export interface IVersion {
     VersionId: number;
     VersionLink: string;
     Lifecycle?: IDocumentLifecycleInfo;
+    FileRef: string;
 }
 
 export interface IFieldChange {

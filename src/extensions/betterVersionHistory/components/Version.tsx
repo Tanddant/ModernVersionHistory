@@ -5,16 +5,20 @@ import { Icon, Text, TooltipHost, PersonaSize, Link, Checkbox, Stack, StackItem 
 import { FieldType } from '../models/FieldTypes';
 import { IFieldUrlValue, IFieldUserValue } from '../models/FieldValues';
 import { ActionButton } from 'office-ui-fabric-react';
+import { IDataProvider } from '../providers/DataProvider';
 
 export interface IVersionProps {
     Version: IVersion;
     className: string;
     selectedVersions?: number[];
     onVersionSelected?: () => void;
+    provider: IDataProvider;
+    reloadVersions: () => void;
 }
 
 export const Version: React.FunctionComponent<IVersionProps> = (props: React.PropsWithChildren<IVersionProps>) => {
-    const { Version } = props;
+    const { Version, provider } = props;
+    
     return (
         <div style={{ display: "flex", padding: 10 }} className={props.className}>
             <Checkbox checked={props.selectedVersions.indexOf(Version.VersionId) > -1} onChange={(e, checked) => props.onVersionSelected()} />&nbsp;
@@ -23,7 +27,15 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
                 <div>
                     <Icon iconName="EditContact" />&nbsp;
                     <Text variant='medium' styles={{ root: { fontWeight: "bold" } }}>Version: {Version.VersionName}</Text>
-                    <ActionButton iconProps={{ iconName: "EntryView" }} text="View version" href={Version.VersionLink} target="_blank" />
+                    <ActionButton iconProps={{ iconName: "EntryView" }} text="View" href={Version.VersionLink} target="_blank" />
+                    <ActionButton iconProps={{ iconName: "Delete" }} text="Delete" onClick={async () => {
+                        await provider.DeleteVersion(Version.VersionId);
+                        props.reloadVersions();
+                    }} target="_blank" />
+                    <ActionButton iconProps={{ iconName: "UpdateRestore" }} text="Restore" onClick={async () => {
+                        await provider.RestoreVersion(Version);
+                        props.reloadVersions();
+                    }} target="_blank" />
                 </div>
                 <div>
                     {Version.Lifecycle &&

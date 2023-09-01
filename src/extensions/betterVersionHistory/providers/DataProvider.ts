@@ -1,4 +1,5 @@
 import { ListViewCommandSetContext } from "@microsoft/sp-listview-extensibility";
+import { SPHttpClient } from "@microsoft/sp-http";
 import { SPFx, SPFI, spfi, IFileInfo } from "@pnp/sp/presets/all";
 import { IField } from "../models/IField";
 import { IVersion } from "../models/IVersion";
@@ -7,7 +8,10 @@ import { IVersionsFilter } from "../models/IVersionsFilter";
 
 export interface IDataProvider {
     GetVersions(filters: IVersionsFilter): Promise<IVersion[]>
+    GetVersions(filters: IVersionsFilter): Promise<IVersion[]>;
     GetFileInfo(): Promise<IFileInfo>;
+    RestoreVersion(versionId: IVersion): Promise<void>;
+    DeleteVersion(versionId: number): Promise<void>;
 }
 
 export class DataProvider implements IDataProvider {
@@ -73,6 +77,7 @@ export class DataProvider implements IDataProvider {
                 VersionId: version.VersionId,
                 // VersionLink: `${this._context.pageContext.list.serverRelativeUrl}/DispForm.aspx?ID=${this._context.listView.selectedRows[0].getValueByName("ID")}&VersionNo=${version.VersionId}`,
                 VersionLink: encodeURI(`${this._context.pageContext.site.absoluteUrl}` + (version.IsCurrentVersion ? version.FileRef : `/_vti_history/${version.VersionId}${version.FileRef}`)),
+                FileRef: version.FileRef,
                 Lifecycle: {
                     CheckinComment: (fileVersionMetadata ? fileVersionMetadata.CheckInComment : version['OData__x005f_CheckinComment']) ?? '',
                     ModerationStatus: (version['OData__x005f_ModerationStatus'] >= 0 ? version['OData__x005f_ModerationStatus'] : undefined),
@@ -110,5 +115,29 @@ export class DataProvider implements IDataProvider {
     private async GetFileVersionMetadata(fileRef: string, versionLabel: number): Promise<IFileInfo> {
         return (await this.getSPFI().web.getFileByServerRelativePath(fileRef).versions())
             .filter(v => v.VersionLabel === versionLabel)[0];
+    }
+
+    
+    public async DeleteVersion(versionId: number): Promise<void> {
+        const item = this.getSPFI().web.lists.getById(this._context.pageContext.list.id.toString()).items.getById(this._context.listView.selectedRows[0].getValueByName("ID"));
+        await item.versions.getById(versionId).delete();
+    }
+
+    public async RestoreVersion(version: IVersion): Promise<void> {
+
+        const FileLink = new URL(`${this._context.pageContext.web.absoluteUrl}/_layouts/15/versions.aspx`);
+        FileLink.searchParams.append("FileName", version.FileRef);
+        FileLink.searchParams.append("list", `{${this._context.pageContext.list.id.toString().toUpperCase()}}`);
+        FileLink.searchParams.append("ID", this._context.listView.selectedRows[0].getValueByName("ID"));
+        FileLink.searchParams.append("col", "Number");
+        FileLink.searchParams.append("order","d");
+        //Todo: Add support
+        //FileLink.searchParams.append("op", "Delete");
+        FileLink.searchParams.append("op", "Restore");
+        FileLink.searchParams.append("ver", version.VersionId + "");
+        FileLink.searchParams.append("IsDlg", "1");
+
+        await this._context.spHttpClient.post(FileLink.toString(), SPHttpClient.configurations.v1, {});
+
     }
 }
