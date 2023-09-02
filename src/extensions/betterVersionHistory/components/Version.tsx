@@ -6,6 +6,7 @@ import { FieldType } from '../models/FieldTypes';
 import { IFieldUrlValue, IFieldUserValue } from '../models/FieldValues';
 import { ActionButton } from 'office-ui-fabric-react';
 import { IDataProvider } from '../providers/DataProvider';
+import { IFileInfo } from '@pnp/sp/files';
 
 export interface IVersionProps {
     Version: IVersion;
@@ -18,7 +19,20 @@ export interface IVersionProps {
 
 export const Version: React.FunctionComponent<IVersionProps> = (props: React.PropsWithChildren<IVersionProps>) => {
     const { Version, provider } = props;
-    
+
+    const [versionMetadata, setVersionMetadata] = React.useState<IFileInfo>(undefined);
+    React.useMemo(() => {
+        getMetadata();
+    }, []);
+
+    async function getMetadata() {
+        const { FileRef, VersionId } = props.Version;
+        const metadata = await props.provider.GetFileVersionMetadata(FileRef, VersionId);
+        console.log(Version);
+        console.log(metadata);
+        setVersionMetadata(metadata);
+    }
+
     return (
         <div style={{ display: "flex", padding: 10 }} className={props.className}>
             <Checkbox checked={props.selectedVersions.indexOf(Version.VersionId) > -1} onChange={(e, checked) => props.onVersionSelected()} />&nbsp;
@@ -38,31 +52,31 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
                     }} target="_blank" />
                 </div>
                 <div>
-                    {Version.Lifecycle &&
+                    {Version.Moderation &&
                         <Stack>
-                            {Version.Lifecycle.ModerationStatus >= 0 &&
+                            {Version.Moderation.ModerationStatus >= 0 &&
                                 <StackItem>
-                                    {Version.Lifecycle.ModerationStatus == 0 && <><Icon iconName="FileComment" style={{ color: 'darkgreen' }} title='Document approved' />&nbsp;Approved</>}
-                                    {Version.Lifecycle.ModerationStatus == 1 && <><Icon iconName="FileComment" style={{ color: 'darkred' }} title='Document approval rejected' />&nbsp;Rejected</>}
-                                    {Version.Lifecycle.ModerationStatus == 2 && <><Icon iconName="FileComment" title='Document approval pending' />&nbsp;Pending</>}
-                                    {Version.Lifecycle.ModerationComments && <Text variant='medium'> &middot; {Version.Lifecycle.ModerationComments}</Text>}
+                                    {Version.Moderation.ModerationStatus == 0 && <><Icon iconName="FileComment" style={{ color: 'darkgreen' }} title='Document approved' />&nbsp;Approved</>}
+                                    {Version.Moderation.ModerationStatus == 1 && <><Icon iconName="FileComment" style={{ color: 'darkred' }} title='Document approval rejected' />&nbsp;Rejected</>}
+                                    {Version.Moderation.ModerationStatus == 2 && <><Icon iconName="FileComment" title='Document approval pending' />&nbsp;Pending</>}
+                                    {Version.Moderation.ModerationComments && <Text variant='medium'> &middot; {Version.Moderation.ModerationComments}</Text>}
                                 </StackItem>
                             }
-                            {Version.Lifecycle.CheckinComment &&
+                            {versionMetadata?.CheckInComment &&
                                 <StackItem>
                                     <Icon iconName="PageCheckedin" title='Document Status Information' />&nbsp;
-                                    <Text variant='medium'>{Version.Lifecycle.CheckinComment}</Text>
+                                    <Text variant='medium'>{versionMetadata.CheckInComment}</Text>
                                 </StackItem>
                             }
                         </Stack>
                     }
                 </div>
-                {Version.Changes.map((change) => {
+                {Version.Changes && Version.Changes.map((change) => {
                     switch (change.FieldType) {
                         case FieldType.User:
                             return <Text styles={{ root: { display: 'flex' } }}>{change.FieldName}:&nbsp;&nbsp;<FieldUser user={change.Data as IFieldUserValue} size={PersonaSize.size24} /></Text>
                         case FieldType.UserMulti:
-                            return <Text styles={{ root: { display: 'flex' } }}>{change.FieldName}:&nbsp;&nbsp; {(change.Data as (IFieldUserValue[])).map(user => <FieldUser user={user} size={PersonaSize.size24} />)} </Text>
+                            return <Text styles={{ root: { display: 'flex' } }}>{change.FieldName}:&nbsp;&nbsp; {(change.Data as (IFieldUserValue[]) ?? []).map(user => <FieldUser user={user} size={PersonaSize.size24} />)} </Text>
                         case FieldType.URL: {
                             const link = change.Data as IFieldUrlValue;
                             return <Text>{change.FieldName}: <Link href={link.Url} target='_blank'>{link.Description}</Link></Text>

@@ -8,7 +8,7 @@ export interface IVersion {
     Changes: IFieldChange[];
     VersionId: number;
     VersionLink: string;
-    Lifecycle?: IDocumentLifecycleInfo;
+    Moderation?: IModerationInfo;
     FileRef: string;
 }
 
@@ -23,9 +23,7 @@ export interface IFieldChange {
     Link?: string;
 }
 
-export interface IDocumentLifecycleInfo {
-    CheckinComment?: string;
+export interface IModerationInfo {
     ModerationStatus?: number;
     ModerationComments?: string;
-
 }
