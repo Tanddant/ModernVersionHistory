@@ -60,6 +60,8 @@ export const BetterVersionHistory: React.FunctionComponent<IBetterVersionHistory
               setSelectedVersions([...selectedVersions, version.VersionId]);
             }
           }}
+          provider={props.provider}
+          reloadVersions={() => { setFilters({}) }}
         />)}
       </Stack>
 
