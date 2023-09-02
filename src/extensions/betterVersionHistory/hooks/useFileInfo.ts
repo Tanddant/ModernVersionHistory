@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
+import { IDataProvider } from "../providers/DataProvider";
 import { IFileInfo } from "@pnp/sp/files";
-import { IDataProvider } from "../models/IDataProvider";
 
 export default function useFileInfo(provider: IDataProvider): { fileInfo: IFileInfo } {
   const [selectedFile, setSelectedFile] = useState<IFileInfo>(undefined);

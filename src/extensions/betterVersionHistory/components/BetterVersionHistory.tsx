@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { CommandBar, DatePicker, DialogContent, Spinner, SpinnerSize, Stack } from '@fluentui/react';
+import { IDataProvider } from '../providers/DataProvider';
 import { Version } from './Version';
 import styles from './BetterVersionHistory.module.scss';
 import useVersions from '../hooks/useVersion';
@@ -7,7 +8,6 @@ import { IVersionsFilter } from '../models/IVersionsFilter';
 import useObject from '../hooks/useObject';
 import useFileInfo from '../hooks/useFileInfo';
 import { PeoplePicker } from './PeoplePicker';
-import { IDataProvider } from '../models/IDataProvider';
 
 export interface IBetterVersionHistoryProps {
   provider: IDataProvider;
@@ -36,7 +36,7 @@ export const BetterVersionHistory: React.FunctionComponent<IBetterVersionHistory
             text: "Clear selection",
             disabled: selectedVersions.length === 0,
             iconProps: { iconName: 'Clear' },
-            onClick: () => { setSelectedVersions([]); setFilters({ VersionNumbers: [] }) }
+            onClick: () => { setSelectedVersions([]), setFilters({ VersionNumbers: [] }) }
           }
         ]}
       />

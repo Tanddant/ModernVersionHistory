@@ -42,9 +42,9 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
                         <Stack>
                             {Version.Lifecycle.ModerationStatus >= 0 &&
                                 <StackItem>
-                                    {Version.Lifecycle.ModerationStatus === 0 && <><Icon iconName="FileComment" style={{ color: 'darkgreen' }} title='Document approved' />&nbsp;Approved</>}
-                                    {Version.Lifecycle.ModerationStatus === 1 && <><Icon iconName="FileComment" style={{ color: 'darkred' }} title='Document approval rejected' />&nbsp;Rejected</>}
-                                    {Version.Lifecycle.ModerationStatus === 2 && <><Icon iconName="FileComment" title='Document approval pending' />&nbsp;Pending</>}
+                                    {Version.Lifecycle.ModerationStatus == 0 && <><Icon iconName="FileComment" style={{ color: 'darkgreen' }} title='Document approved' />&nbsp;Approved</>}
+                                    {Version.Lifecycle.ModerationStatus == 1 && <><Icon iconName="FileComment" style={{ color: 'darkred' }} title='Document approval rejected' />&nbsp;Rejected</>}
+                                    {Version.Lifecycle.ModerationStatus == 2 && <><Icon iconName="FileComment" title='Document approval pending' />&nbsp;Pending</>}
                                     {Version.Lifecycle.ModerationComments && <Text variant='medium'> &middot; {Version.Lifecycle.ModerationComments}</Text>}
                                 </StackItem>
                             }
