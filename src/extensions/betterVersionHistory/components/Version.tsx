@@ -28,8 +28,6 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
     async function getMetadata() {
         const { FileRef, VersionId } = props.Version;
         const metadata = await props.provider.GetFileVersionMetadata(FileRef, VersionId);
-        console.log(Version);
-        console.log(metadata);
         setVersionMetadata(metadata);
     }
 
