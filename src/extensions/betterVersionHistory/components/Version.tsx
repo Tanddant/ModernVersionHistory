@@ -37,12 +37,9 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
                 text: 'Delete version',
                 iconProps: { iconName: 'Delete' },
                 onClick: () => {
-                    console.log('delete');
-                    async () => {
-                        await provider.DeleteVersion(Version.VersionId);
-                        console.log('deleted');
+                    provider.DeleteVersion(Version.VersionId).then(() => {
                         props.reloadVersions();
-                    }
+                    });
                 },
                 target: '_blank'
             },
@@ -51,10 +48,9 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
                 text: 'Restore version',
                 iconProps: { iconName: 'UpdateRestore' },
                 onClick: () => {
-                    async () => {
-                        await provider.RestoreVersion(Version);
+                    provider.RestoreVersion(Version).then(() => {
                         props.reloadVersions();
-                    }
+                    })
                 },
                 target: '_blank'
             },
