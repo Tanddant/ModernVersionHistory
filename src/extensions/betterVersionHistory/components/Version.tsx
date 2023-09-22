@@ -6,8 +6,8 @@ import { FieldType } from '../models/FieldTypes';
 import { IFieldUrlValue, IFieldUserValue } from '../models/FieldValues';
 import { useConst } from '@fluentui/react-hooks';
 import { IDataProvider } from '../providers/DataProvider';
-import { IFileInfo } from '@pnp/sp/files';
 import styles from './BetterVersionHistory.module.scss';
+import useVersionMetadata from '../hooks/useVersionMetadata';
 
 export interface IVersionProps {
     Version: IVersion;
@@ -20,17 +20,7 @@ export interface IVersionProps {
 
 export const Version: React.FunctionComponent<IVersionProps> = (props: React.PropsWithChildren<IVersionProps>) => {
     const { Version, provider } = props;
-
-    const [versionMetadata, setVersionMetadata] = React.useState<IFileInfo>(undefined);
-    React.useMemo(() => {
-        getMetadata();
-    }, []);
-
-    async function getMetadata() {
-        const { FileRef, VersionId } = props.Version;
-        const metadata = await props.provider.GetFileVersionMetadata(FileRef, VersionId);
-        setVersionMetadata(metadata);
-    }
+    const { versionMetadata } = useVersionMetadata(Version, provider);
 
     const menuProps = useConst<IContextualMenuProps>(() => ({
         shouldFocusOnMount: true,
