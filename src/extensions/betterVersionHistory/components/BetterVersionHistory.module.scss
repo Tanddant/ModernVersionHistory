@@ -1,3 +1,25 @@
-.test {
-    border-bottom: 1px solid #eaeaea;
+:root {
+    @media screen and (min-width: 1170px) {
+        .vertical-timeline {
+            width: 100%;
+            padding: 0;
+
+            .vertical-timeline-element {
+                margin: 2em 0;
+            }
+
+            .vertical-timeline-element-content {
+                margin-left: 0px;
+            }
+
+            .vertical-timeline-element-date {
+                display: none;
+            }
+
+            button.version {
+                height: 26px;
+                padding: 0px 8px;
+            }
+        }
+    }
 }
