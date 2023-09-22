@@ -1,13 +1,12 @@
 import * as React from 'react';
 import { IVersion } from '../models/IVersion';
 import { FieldUser } from './FieldUserPerson';
-import { Icon, Text, TooltipHost, PersonaSize, Link, Checkbox, Stack, StackItem, DefaultButton, IContextualMenuProps } from '@fluentui/react';
+import { Icon, Text, TooltipHost, PersonaSize, Link, Checkbox, Stack, StackItem, ActionButton, IContextualMenuProps } from '@fluentui/react';
 import { FieldType } from '../models/FieldTypes';
 import { IFieldUrlValue, IFieldUserValue } from '../models/FieldValues';
-import { useConst } from '@fluentui/react-hooks';
 import { IDataProvider } from '../providers/DataProvider';
-import styles from './BetterVersionHistory.module.scss';
 import useVersionMetadata from '../hooks/useVersionMetadata';
+import styles from './BetterVersionHistory.module.scss';
 
 export interface IVersionProps {
     Version: IVersion;
@@ -19,27 +18,28 @@ export interface IVersionProps {
 }
 
 export const Version: React.FunctionComponent<IVersionProps> = (props: React.PropsWithChildren<IVersionProps>) => {
-    const { Version, provider } = props;
+    const { Version, provider, reloadVersions } = props;
     const { versionMetadata } = useVersionMetadata(Version, provider);
 
-    const versionMenuProps = useConst<IContextualMenuProps>(() => ({
-        shouldFocusOnMount: true,
+    const versionMenuProps: IContextualMenuProps = {
         items: [
             {
                 key: 'version-view',
                 text: 'View version',
                 iconProps: { iconName: 'EntryView' },
                 href: `${Version.VersionLink}`,
-                target: '_blank'
+                target: '_blank',
             },
             {
                 key: 'version-delete',
                 text: 'Delete version',
                 iconProps: { iconName: 'Delete' },
                 onClick: () => {
-                    provider.DeleteVersion(Version.VersionId).then(() => {
-                        props.reloadVersions();
-                    });
+                    provider
+                        .DeleteVersion(Version.VersionId)
+                        .then(() => {
+                            reloadVersions();
+                        });
                 },
                 target: '_blank'
             },
@@ -48,24 +48,26 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
                 text: 'Restore version',
                 iconProps: { iconName: 'UpdateRestore' },
                 onClick: () => {
-                    provider.RestoreVersion(Version).then(() => {
-                        props.reloadVersions();
-                    })
+                    provider
+                        .RestoreVersion(Version)
+                        .then(() => {
+                            reloadVersions();
+                        })
                 },
                 target: '_blank'
             },
-        ],
-    }));
+        ]
+    };
 
     return (
-        <Stack tokens={{ childrenGap: 10 }} horizontal verticalAlign='start'>
+        <Stack tokens={{ childrenGap: 10 }} horizontal verticalAlign='start' >
             <StackItem
                 style={{ paddingTop: '3px' }}
                 children={<Checkbox checked={props.selectedVersions.indexOf(Version.VersionId) > -1} onChange={(e, checked) => props.onVersionSelected()} />} />
             <StackItem grow={1}>
                 <Stack tokens={{ childrenGap: 15 }} horizontal styles={{ root: { paddingBottom: '10px' } }} verticalAlign='center'>
                     <StackItem>
-                        <DefaultButton className={styles.version} text={`Version ${Version.VersionName}`} menuProps={versionMenuProps} />
+                        <ActionButton className={styles.version} text={`Version ${Version.VersionName}`} menuProps={versionMenuProps} />
                     </StackItem>
                     {Version.Moderation &&
                         <StackItem grow={2}>
@@ -83,7 +85,7 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
                 {Version.Moderation &&
                     <Stack>
                         {versionMetadata?.CheckInComment &&
-                            <StackItem styles={{ root: { backgroundColor: "lightgrey", borderRadius: 3, padding: "0.25em", width: '100%' } }}>
+                            <StackItem styles={{ root: { backgroundColor: 'lightgrey', borderRadius: 3, padding: '0.25em', width: '100%' } }}>
                                 <Icon iconName="PageCheckedin" title='Document Status Information' />&nbsp;
                                 <Text variant='medium'>{versionMetadata.CheckInComment}</Text>
                             </StackItem>
@@ -109,6 +111,6 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
                     })}
                 </Stack>
             </StackItem>
-        </Stack>
+        </Stack >
     );
 };

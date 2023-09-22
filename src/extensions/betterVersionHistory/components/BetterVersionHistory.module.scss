@@ -1,4 +1,8 @@
 :root {
+    div.ms-CommandBar {
+        background-color: unset;
+    }
+
     @media screen and (min-width: 1170px) {
         .vertical-timeline {
             width: 100%;
@@ -16,9 +20,12 @@
                 display: none;
             }
 
-            button.version {
+            .version {
+                border: 1px solid lightgrey;
+                width: fit-content;
+                background-color: white;
                 height: 26px;
-                padding: 0px 8px;
+                padding: 0 4px;
             }
         }
     }
