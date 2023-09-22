@@ -66,7 +66,7 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
             <StackItem
                 style={{ paddingTop: '3px' }}
                 children={<Checkbox checked={props.selectedVersions.indexOf(Version.VersionId) > -1} onChange={(e, checked) => props.onVersionSelected()} />} />
-            <StackItem>
+            <StackItem grow={1}>
                 <Stack tokens={{ childrenGap: 15 }} horizontal styles={{ root: { paddingBottom: '10px' } }} verticalAlign='center'>
                     <StackItem>
                         <DefaultButton className={styles.version} text={`Version ${Version.VersionName}`} menuProps={versionMenuProps} />
@@ -84,34 +84,34 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
                         <Text variant='small'>{Version.TimeStamp.toLocaleString()}</Text>
                     </StackItem>
                 </Stack>
-                <div>
-                    {Version.Moderation &&
-                        <Stack>
-                            {versionMetadata?.CheckInComment &&
-                                <StackItem styles={{ root: { backgroundColor: "lightgrey", borderRadius: 3, padding: "0.25em", width: '100%' } }}>
-                                    <Icon iconName="PageCheckedin" title='Document Status Information' />&nbsp;
-                                    <Text variant='medium'>{versionMetadata.CheckInComment}</Text>
-                                </StackItem>
-                            }
-                        </Stack>
-                    }
-                </div>
-                {Version.Changes && Version.Changes.map((change) => {
-                    switch (change.FieldType) {
-                        case FieldType.User:
-                            return <Text styles={{ root: { display: 'flex' } }}>{change.FieldName}:&nbsp;&nbsp;<FieldUser user={change.Data as IFieldUserValue} size={PersonaSize.size8} /></Text>
-                        case FieldType.UserMulti:
-                            return <Text styles={{ root: { display: 'flex' } }}>{change.FieldName}:&nbsp;&nbsp; {(change.Data as (IFieldUserValue[]) ?? []).map(user => <FieldUser user={user} size={PersonaSize.size8} />)} </Text>
-                        case FieldType.URL: {
-                            const link = change.Data as IFieldUrlValue;
-                            return <Text>{change.FieldName}: <Link href={link.Url} target='_blank'>{link.Description}</Link></Text>
+                {Version.Moderation &&
+                    <Stack>
+                        {versionMetadata?.CheckInComment &&
+                            <StackItem styles={{ root: { backgroundColor: "lightgrey", borderRadius: 3, padding: "0.25em", width: '100%' } }}>
+                                <Icon iconName="PageCheckedin" title='Document Status Information' />&nbsp;
+                                <Text variant='medium'>{versionMetadata.CheckInComment}</Text>
+                            </StackItem>
                         }
-                        case FieldType.Lookup:
-                            return <Text>{change.FieldName}: <Link href={change.Link} target='_blank'>{change.NewValue}</Link></Text>
-                        default:
-                            return <Text>{change.FieldName}: <TooltipHost content={change.OldValue}>{change.NewValue}</TooltipHost></Text>
-                    }
-                })}
+                    </Stack>
+                }
+                <Stack>
+                    {Version.Changes && Version.Changes.map((change) => {
+                        switch (change.FieldType) {
+                            case FieldType.User:
+                                return <Text styles={{ root: { display: 'flex' } }}>{change.FieldName}:&nbsp;&nbsp;<FieldUser user={change.Data as IFieldUserValue} size={PersonaSize.size8} /></Text>
+                            case FieldType.UserMulti:
+                                return <Text styles={{ root: { display: 'flex' } }}>{change.FieldName}:&nbsp;&nbsp; {(change.Data as (IFieldUserValue[]) ?? []).map(user => <FieldUser user={user} size={PersonaSize.size8} />)} </Text>
+                            case FieldType.URL: {
+                                const link = change.Data as IFieldUrlValue;
+                                return <Text>{change.FieldName}: <Link href={link.Url} target='_blank'>{link.Description}</Link></Text>
+                            }
+                            case FieldType.Lookup:
+                                return <Text>{change.FieldName}: <Link href={change.Link} target='_blank'>{change.NewValue}</Link></Text>
+                            default:
+                                return <Text>{change.FieldName}: <TooltipHost content={change.OldValue}>{change.NewValue}</TooltipHost></Text>
+                        }
+                    })}
+                </Stack>
             </StackItem>
         </Stack>
     );
