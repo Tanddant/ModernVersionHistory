@@ -22,7 +22,7 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
     const { Version, provider } = props;
     const { versionMetadata } = useVersionMetadata(Version, provider);
 
-    const menuProps = useConst<IContextualMenuProps>(() => ({
+    const versionMenuProps = useConst<IContextualMenuProps>(() => ({
         shouldFocusOnMount: true,
         items: [
             {
@@ -66,10 +66,10 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
             <StackItem
                 style={{ paddingTop: '3px' }}
                 children={<Checkbox checked={props.selectedVersions.indexOf(Version.VersionId) > -1} onChange={(e, checked) => props.onVersionSelected()} />} />
-            <div style={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
+            <StackItem>
                 <Stack tokens={{ childrenGap: 15 }} horizontal styles={{ root: { paddingBottom: '10px' } }} verticalAlign='center'>
                     <StackItem>
-                        <DefaultButton className={styles.version} text={`Version ${Version.VersionName}`} menuProps={menuProps} />
+                        <DefaultButton className={styles.version} text={`Version ${Version.VersionName}`} menuProps={versionMenuProps} />
                     </StackItem>
                     {Version.Moderation &&
                         <StackItem grow={2}>
@@ -112,7 +112,7 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
                             return <Text>{change.FieldName}: <TooltipHost content={change.OldValue}>{change.NewValue}</TooltipHost></Text>
                     }
                 })}
-            </div>
+            </StackItem>
         </Stack>
     );
 };
