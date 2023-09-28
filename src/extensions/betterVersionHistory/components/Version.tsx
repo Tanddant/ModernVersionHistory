@@ -59,6 +59,9 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
         ]
     };
 
+    const fileSize: number = ((versionMetadata as any)?.Size ?? 0) ? ((versionMetadata as any)?.Size ?? 0) / 1024 : Version.FileSize / 1024;
+    const fileSizeText = fileSize > 10**3 ? `${(fileSize / 10**3).toFixed(2)} MB` : fileSize > 10**6 ? `${(fileSize / 10**6).toFixed(2)} GB` : `${fileSize.toFixed(2)} KB`;
+
     return (
         <Stack tokens={{ childrenGap: 10 }} horizontal verticalAlign='start' >
             <StackItem
@@ -69,11 +72,14 @@ export const Version: React.FunctionComponent<IVersionProps> = (props: React.Pro
                     <StackItem>
                         <ActionButton className={styles.version} text={`Version ${Version.VersionName}`} menuProps={versionMenuProps} />
                     </StackItem>
+                    <StackItem>
+                        <Text>{fileSizeText}</Text>
+                    </StackItem>
                     {Version.Moderation &&
                         <StackItem grow={2}>
-                            {Version.Moderation.ModerationStatus == 0 && <><Icon iconName="FileComment" style={{ color: 'darkgreen' }} title='Document approved' />&nbsp;Approved</>}
-                            {Version.Moderation.ModerationStatus == 1 && <><Icon iconName="FileComment" style={{ color: 'darkred' }} title='Document approval rejected' />&nbsp;Rejected</>}
-                            {Version.Moderation.ModerationStatus == 2 && <><Icon iconName="FileComment" title='Document approval pending' />&nbsp;Pending</>}
+                            {Version.Moderation.ModerationStatus === 0 && <><Icon iconName="FileComment" style={{ color: 'darkgreen' }} title='Document approved' />&nbsp;Approved</>}
+                            {Version.Moderation.ModerationStatus === 1 && <><Icon iconName="FileComment" style={{ color: 'darkred' }} title='Document approval rejected' />&nbsp;Rejected</>}
+                            {Version.Moderation.ModerationStatus === 2 && <><Icon iconName="FileComment" title='Document approval pending' />&nbsp;Pending</>}
                             {Version.Moderation.ModerationComments && <Text variant='small'> &middot; {Version.Moderation.ModerationComments}</Text>}
                         </StackItem>
                     }

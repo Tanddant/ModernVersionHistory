@@ -10,6 +10,8 @@ export interface IVersion {
     VersionLink: string;
     Moderation?: IModerationInfo;
     FileRef: string;
+    FileName: string;
+    FileSize: number;
 }
 
 export interface IFieldChange {

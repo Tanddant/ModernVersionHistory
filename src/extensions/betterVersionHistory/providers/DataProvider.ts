@@ -78,6 +78,8 @@ export class DataProvider implements IDataProvider {
                 // VersionLink: `${this._context.pageContext.list.serverRelativeUrl}/DispForm.aspx?ID=${this._context.listView.selectedRows[0].getValueByName("ID")}&VersionNo=${version.VersionId}`,
                 VersionLink: encodeURI(`${this._context.pageContext.site.absoluteUrl}` + (version.IsCurrentVersion ? version.FileRef : `/_vti_history/${version.VersionId}${version.FileRef}`)),
                 FileRef: version.FileRef,
+                FileName: version.FileLeafRef,
+                FileSize: version.SMTotalFileStreamSize,
                 Moderation: {
                     ModerationStatus: (version['OData__x005f_ModerationStatus'] >= 0 ? version['OData__x005f_ModerationStatus'] : undefined),
                     ModerationComments: (version['OData__x005f_ModerationStatus'] >= 0 ? version['OData__x005f_ModerationComments'] : ''),
@@ -128,8 +130,6 @@ export class DataProvider implements IDataProvider {
         FileLink.searchParams.append("ID", this._context.listView.selectedRows[0].getValueByName("ID"));
         FileLink.searchParams.append("col", "Number");
         FileLink.searchParams.append("order", "d");
-        //Todo: Add support
-        //FileLink.searchParams.append("op", "Delete");
         FileLink.searchParams.append("op", "Restore");
         FileLink.searchParams.append("ver", version.VersionId + "");
         FileLink.searchParams.append("IsDlg", "1");
