@@ -72,7 +72,7 @@ export class DataProvider implements IDataProvider {
             const Version: IVersion = {
                 VersionName: version.VersionLabel,
                 Author: version.Editor,
-                TimeStamp: new Date(version.Created),
+                TimeStamp: new Date(`${version.Created}z`),
                 Changes: [],
                 VersionId: version.VersionId,
                 // VersionLink: `${this._context.pageContext.list.serverRelativeUrl}/DispForm.aspx?ID=${this._context.listView.selectedRows[0].getValueByName("ID")}&VersionNo=${version.VersionId}`,
