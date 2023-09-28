@@ -30,7 +30,7 @@ export const BetterVersionHistory: React.FunctionComponent<IBetterVersionHistory
         items={[
           {
             key: "ShowSelectedVersions",
-            text: 'Show for selected items',
+            text: 'Compare selected versions',
             disabled: selectedVersions.length === 0,
             iconProps: { iconName: 'BranchCompare' },
             onClick: () => { setFilters({ VersionNumbers: selectedVersions }) }
