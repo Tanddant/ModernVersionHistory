@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { IVersion } from '../models/IVersion';
 import { FieldUser } from './FieldUserPerson';
-import { Icon, Text, TooltipHost, PersonaSize, Link, Checkbox, Stack, StackItem } from '@fluentui/react';
+import { Icon, Text, TooltipHost, PersonaSize, Link, Checkbox, Stack, StackItem, ActionButton, IContextualMenuProps } from '@fluentui/react';
 import { FieldType } from '../models/FieldTypes';
 import { IFieldUrlValue, IFieldUserValue } from '../models/FieldValues';
-import { ActionButton } from 'office-ui-fabric-react';
 import { IDataProvider } from '../providers/DataProvider';
-import { IFileInfo } from '@pnp/sp/files';
+import useVersionMetadata from '../hooks/useVersionMetadata';
+import styles from './BetterVersionHistory.module.scss';
 
 export interface IVersionProps {
     Version: IVersion;
@@ -18,81 +18,105 @@ export interface IVersionProps {
 }
 
 export const Version: React.FunctionComponent<IVersionProps> = (props: React.PropsWithChildren<IVersionProps>) => {
-    const { Version, provider } = props;
+    const { Version, provider, reloadVersions } = props;
+    const { versionMetadata } = useVersionMetadata(Version, provider);
 
-    const [versionMetadata, setVersionMetadata] = React.useState<IFileInfo>(undefined);
-    React.useMemo(() => {
-        getMetadata();
-    }, []);
+    const versionMenuProps: IContextualMenuProps = {
+        items: [
+            {
+                key: 'version-view',
+                text: 'View version',
+                iconProps: { iconName: 'EntryView' },
+                href: `${Version.VersionLink}`,
+                target: '_blank',
+            },
+            {
+                key: 'version-delete',
+                text: 'Delete version',
+                iconProps: { iconName: 'Delete' },
+                onClick: () => {
+                    provider
+                        .DeleteVersion(Version.VersionId)
+                        .then(() => {
+                            reloadVersions();
+                        });
+                },
+                target: '_blank'
+            },
+            {
+                key: 'version-restore',
+                text: 'Restore version',
+                iconProps: { iconName: 'UpdateRestore' },
+                onClick: () => {
+                    provider
+                        .RestoreVersion(Version)
+                        .then(() => {
+                            reloadVersions();
+                        })
+                },
+                target: '_blank'
+            },
+        ]
+    };
 
-    async function getMetadata() {
-        const { FileRef, VersionId } = props.Version;
-        const metadata = await props.provider.GetFileVersionMetadata(FileRef, VersionId);
-        console.log(Version);
-        console.log(metadata);
-        setVersionMetadata(metadata);
-    }
+    const fileSize: number = ((versionMetadata as any)?.Size ?? 0) ? ((versionMetadata as any)?.Size ?? 0) / 1024 : Version.FileSize / 1024;
+    const fileSizeText = fileSize > 10**3 ? `${(fileSize / 10**3).toFixed(2)} MB` : fileSize > 10**6 ? `${(fileSize / 10**6).toFixed(2)} GB` : `${fileSize.toFixed(2)} KB`;
 
     return (
-        <div style={{ display: "flex", padding: 10 }} className={props.className}>
-            <Checkbox checked={props.selectedVersions.indexOf(Version.VersionId) > -1} onChange={(e, checked) => props.onVersionSelected()} />&nbsp;
-            <FieldUser user={Version.Author} hidePersonaDetails />
-            <div style={{ display: "flex", flexDirection: "column", marginLeft: "1em", flexGrow: 1 }}>
-                <div>
-                    <Icon iconName="EditContact" />&nbsp;
-                    <Text variant='medium' styles={{ root: { fontWeight: "bold" } }}>Version: {Version.VersionName}</Text>
-                    <ActionButton iconProps={{ iconName: "EntryView" }} text="View" href={Version.VersionLink} target="_blank" />
-                    <ActionButton iconProps={{ iconName: "Delete" }} text="Delete" onClick={async () => {
-                        await provider.DeleteVersion(Version.VersionId);
-                        props.reloadVersions();
-                    }} target="_blank" />
-                    <ActionButton iconProps={{ iconName: "UpdateRestore" }} text="Restore" onClick={async () => {
-                        await provider.RestoreVersion(Version);
-                        props.reloadVersions();
-                    }} target="_blank" />
-                </div>
-                <div>
+        <Stack tokens={{ childrenGap: 10 }} horizontal verticalAlign='start' >
+            <StackItem
+                style={{ paddingTop: '3px' }}
+                children={<Checkbox checked={props.selectedVersions.indexOf(Version.VersionId) > -1} onChange={(e, checked) => props.onVersionSelected()} />} />
+            <StackItem grow={1}>
+                <Stack tokens={{ childrenGap: 15 }} horizontal styles={{ root: { paddingBottom: '10px' } }} verticalAlign='center'>
+                    <StackItem>
+                        <ActionButton className={styles.version} text={`Version ${Version.VersionName}`} menuProps={versionMenuProps} />
+                    </StackItem>
+                    <StackItem>
+                        <Text>{fileSizeText}</Text>
+                    </StackItem>
                     {Version.Moderation &&
-                        <Stack>
-                            {Version.Moderation.ModerationStatus >= 0 &&
-                                <StackItem>
-                                    {Version.Moderation.ModerationStatus == 0 && <><Icon iconName="FileComment" style={{ color: 'darkgreen' }} title='Document approved' />&nbsp;Approved</>}
-                                    {Version.Moderation.ModerationStatus == 1 && <><Icon iconName="FileComment" style={{ color: 'darkred' }} title='Document approval rejected' />&nbsp;Rejected</>}
-                                    {Version.Moderation.ModerationStatus == 2 && <><Icon iconName="FileComment" title='Document approval pending' />&nbsp;Pending</>}
-                                    {Version.Moderation.ModerationComments && <Text variant='medium'> &middot; {Version.Moderation.ModerationComments}</Text>}
-                                </StackItem>
-                            }
-                            {versionMetadata?.CheckInComment &&
-                                <StackItem>
-                                    <Icon iconName="PageCheckedin" title='Document Status Information' />&nbsp;
-                                    <Text variant='medium'>{versionMetadata.CheckInComment}</Text>
-                                </StackItem>
-                            }
-                        </Stack>
+                        <StackItem grow={2}>
+                            {Version.Moderation.ModerationStatus === 0 && <><Icon iconName="FileComment" style={{ color: 'darkgreen' }} title='Document approved' />&nbsp;Approved</>}
+                            {Version.Moderation.ModerationStatus === 1 && <><Icon iconName="FileComment" style={{ color: 'darkred' }} title='Document approval rejected' />&nbsp;Rejected</>}
+                            {Version.Moderation.ModerationStatus === 2 && <><Icon iconName="FileComment" title='Document approval pending' />&nbsp;Pending</>}
+                            {Version.Moderation.ModerationComments && <Text variant='small'> &middot; {Version.Moderation.ModerationComments}</Text>}
+                        </StackItem>
                     }
-                </div>
-                {Version.Changes && Version.Changes.map((change) => {
-                    switch (change.FieldType) {
-                        case FieldType.User:
-                            return <Text styles={{ root: { display: 'flex' } }}>{change.FieldName}:&nbsp;&nbsp;<FieldUser user={change.Data as IFieldUserValue} size={PersonaSize.size24} /></Text>
-                        case FieldType.UserMulti:
-                            return <Text styles={{ root: { display: 'flex' } }}>{change.FieldName}:&nbsp;&nbsp; {(change.Data as (IFieldUserValue[]) ?? []).map(user => <FieldUser user={user} size={PersonaSize.size24} />)} </Text>
-                        case FieldType.URL: {
-                            const link = change.Data as IFieldUrlValue;
-                            return <Text>{change.FieldName}: <Link href={link.Url} target='_blank'>{link.Description}</Link></Text>
+                    <StackItem grow={1} style={{ textAlign: 'right', lineHeight: '1em' }}>
+                        <Text variant='small'>{Version.Author.LookupValue}</Text><br />
+                        <Text variant='small'>{Version.TimeStamp.toLocaleString()}</Text>
+                    </StackItem>
+                </Stack>
+                {Version.Moderation &&
+                    <Stack>
+                        {versionMetadata?.CheckInComment &&
+                            <StackItem styles={{ root: { backgroundColor: 'lightgrey', borderRadius: 3, padding: '0.25em', width: '100%' } }}>
+                                <Icon iconName="PageCheckedin" title='Document Status Information' />&nbsp;
+                                <Text variant='medium'>{versionMetadata.CheckInComment}</Text>
+                            </StackItem>
                         }
-                        case FieldType.Lookup:
-                            return <Text>{change.FieldName}: <Link href={change.Link} target='_blank'>{change.NewValue}</Link></Text>
-                        default:
-                            return <Text>{change.FieldName}: <TooltipHost content={change.OldValue}>{change.NewValue}</TooltipHost></Text>
-                    }
-                })}
-
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <Text variant='small' styles={{ root: { backgroundColor: "lightgrey", borderRadius: 3, padding: "0.25em" } }}>{Version.Author.LookupValue}</Text>
-                    <Text variant='small'>{Version.TimeStamp.toLocaleString()}</Text>
-                </div>
-            </div>
-        </div>
+                    </Stack>
+                }
+                <Stack>
+                    {Version.Changes && Version.Changes.map((change) => {
+                        switch (change.FieldType) {
+                            case FieldType.User:
+                                return <Text styles={{ root: { display: 'flex' } }}>{change.FieldName}:&nbsp;&nbsp;<FieldUser user={change.Data as IFieldUserValue} size={PersonaSize.size8} /></Text>
+                            case FieldType.UserMulti:
+                                return <Text styles={{ root: { display: 'flex' } }}>{change.FieldName}:&nbsp;&nbsp; {(change.Data as (IFieldUserValue[]) ?? []).map(user => <FieldUser user={user} size={PersonaSize.size8} />)} </Text>
+                            case FieldType.URL: {
+                                const link = change.Data as IFieldUrlValue;
+                                return <Text>{change.FieldName}: <Link href={link.Url} target='_blank'>{link.Description}</Link></Text>
+                            }
+                            case FieldType.Lookup:
+                                return <Text>{change.FieldName}: <Link href={change.Link} target='_blank'>{change.NewValue}</Link></Text>
+                            default:
+                                return <Text>{change.FieldName}: <TooltipHost content={change.OldValue}>{change.NewValue}</TooltipHost></Text>
+                        }
+                    })}
+                </Stack>
+            </StackItem>
+        </Stack >
     );
 };
