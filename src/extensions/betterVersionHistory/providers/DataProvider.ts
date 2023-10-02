@@ -76,7 +76,7 @@ export class DataProvider implements IDataProvider {
                 Changes: [],
                 VersionId: version.VersionId,
                 // VersionLink: `${this._context.pageContext.list.serverRelativeUrl}/DispForm.aspx?ID=${this._context.listView.selectedRows[0].getValueByName("ID")}&VersionNo=${version.VersionId}`,
-                VersionLink: encodeURI(`${this._context.pageContext.site.absoluteUrl}` + (version.IsCurrentVersion ? version.FileRef : `/_vti_history/${version.VersionId}${version.FileRef}`)),
+                VersionLink: version["ContentTypeId"]["StringValue"].indexOf("0x0100") > -1 ? `${this._context.pageContext.list.serverRelativeUrl}/DispForm.aspx?ID=${this._context.listView.selectedRows[0].getValueByName("ID")}&VersionNo=${version.VersionId}` : encodeURI(`${this._context.pageContext.site.absoluteUrl}` + (version.IsCurrentVersion ? version.FileRef : `/_vti_history/${version.VersionId}${version.FileRef}`)),
                 FileRef: version.FileRef,
                 FileName: version.FileLeafRef,
                 FileSize: version.SMTotalFileStreamSize,

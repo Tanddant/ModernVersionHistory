@@ -17,9 +17,8 @@ A modern UI version of the traditional version history page for SharePoint lists
 - [x] Delete a previous version
 - [x] View the full version
 - [x] Approver (and comments)
-- [ ] Show only changes to specific fields
-- [ ] Show only changes to specific fields by specific users
 
+Uses 'react-vertical-timeline-component' for an awesome timeline view.
 
 ## Compatibility
 
